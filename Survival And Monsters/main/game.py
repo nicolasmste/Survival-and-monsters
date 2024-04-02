@@ -34,6 +34,8 @@ class Play:
         self.player = Player(0,0)
 
         self.listEnnemis = []
+        self.tailleVague = 10 #taille de la premiere vague d'ennemis
+        self.coefVague = 1
 
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=1 )
@@ -55,17 +57,19 @@ class Play:
         clock = pygame.time.Clock() #Objet de type horloge
         #Boucle de run, (exit permet de sortir de la boucle quand on ferme la fenêtre)
         running = True
+
         while running:
-            
-            if (pygame.time.get_ticks()) > 500 and (pygame.time.get_ticks()) < 550:#trouver un meilleur moyen de faire apparaitre les ennemis
-                print("new ennemi")
-                self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
-                self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
+            print(clock)
+            if self.listEnnemis ==[]:
+                for i in range(0,self.tailleVague*self.coefVague):#fait apparaitre un vague d'ennemis
+                    self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
+                    self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
+                self.coefVague = randint(1,3)
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
                 self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
-            print("HP = ", self.player.HP)
+            #print("HP = ", self.player.HP)
 
             self.keybordinput()
             self.group.update() #update position du joueur

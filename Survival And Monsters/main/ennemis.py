@@ -27,19 +27,36 @@ class ennemi(pygame.sprite.Sprite):
         Ex = self.pos[0]
         Ey = self.pos[1]
         if Ex < Px:
-            self.pos[0] += self.speed
+            if Ex + self.speed > Px :
+                self.pos[0] = Px
+            else:
+                self.pos[0] += self.speed
+        
         else:
-            self.pos[0] -= self.speed
+            if Ex - self.speed < Px :
+                self.pos[0] = Px
+            else:
+                self.pos[0] -= self.speed
+        
         if Ey < Py:
-            self.pos[1] += self.speed
+            if Ey + self.speed > Py :
+                self.pos[1] = Py
+            else:
+                self.pos[1] += self.speed
+        
         else:
-            self.pos[1] -= self.speed
+            if Ey - self.speed < Py:
+                self.pos[1] = Py
+            else:
+                self.pos[1] -= self.speed
 
     def damage(self,Ppos,PHP):
         if (self.pos[0] == Ppos[0]) and (self.pos[1] == Ppos[1]):#les ennemis n'ont pas les memes coordonnées que les ennemis
             PHP -= self.attack
             print("damage HP - ",self.attack)
+            del self
         return PHP
+
 
 
     def update(self):
