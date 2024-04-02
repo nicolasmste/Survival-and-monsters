@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self,x,y):
         super().__init__()
-        self.sprite_sheet = pygame.image.load('Sprites\Character\Base.png')
+        self.sprite_sheet = pygame.image.load('Sprites/Character/Base.png')
         self.image = self.get_image(0, 0) #coordonées de début du get
 
         self.image.set_colorkey([0, 0, 0]) #on sup le noir
@@ -27,6 +27,12 @@ class Player(pygame.sprite.Sprite):
 
     def go_down(self): self.pos[1] += self.speed
 
+
+    def end(self):
+        if self.HP <= 0:
+            print("game over")
+            pygame.quit()
+            exit()
 
     def update(self):#actualisation de la position
         self.rect.topleft = self.pos  #position
