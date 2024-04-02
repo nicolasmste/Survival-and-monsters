@@ -28,7 +28,7 @@ class Attack(pygame.sprite.Sprite):
         self.rect.x += self.velocity 
         self.rotate()
 
-        if self.rect.x > 1180 :
+        if self.rect.x > 1250 :
             self.remove()
     
     #def get_fireball(self,x,y) :
