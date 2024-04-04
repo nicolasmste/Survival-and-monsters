@@ -68,7 +68,11 @@ class Play:
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
-                self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
+                #self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
+                if en.dead(self.player.pos) == True:#si l'enemis est mort
+                    self.listEnnemis.remove(en)
+                    self.group.remove(en)
+                    
             #print("HP = ", self.player.HP)
 
             self.keybordinput()

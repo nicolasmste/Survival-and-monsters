@@ -51,13 +51,16 @@ class ennemi(pygame.sprite.Sprite):
                 self.pos[1] -= self.speed
 
     def damage(self,Ppos,PHP):
-        if (self.pos[0] == Ppos[0]) and (self.pos[1] == Ppos[1]):#les ennemis n'ont pas les memes coordonnées que les ennemis
+        if (self.pos[0] == Ppos[0]) and (self.pos[1] == Ppos[1]):
             PHP -= self.attack
             print("damage HP - ",self.attack)
             del self
         return PHP
 
-
+    def dead(self,Ppos):
+        r = 100
+        if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):#si la position en X est compris entre PosPx + a et PosPx -a
+            return True
 
     def update(self):
         self.rect.topleft = self.pos 
