@@ -58,7 +58,7 @@ class ennemi(pygame.sprite.Sprite):
         return PHP
 
     def dead(self,Ppos):
-        r = 100
+        r = 13
         if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):#si la position en X est compris entre PosPx + a et PosPx -a
             return True
 

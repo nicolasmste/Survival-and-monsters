@@ -59,7 +59,6 @@ class Play:
         running = True
 
         while running:
-            print(clock)
             if self.listEnnemis ==[]:
                 for i in range(0,self.tailleVague*self.coefVague):#fait apparaitre un vague d'ennemis
                     self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
@@ -68,8 +67,9 @@ class Play:
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
-                #self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
+                self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
                 if en.dead(self.player.pos) == True:#si l'enemis est mort
+                    self.player.killcount += 1
                     self.listEnnemis.remove(en)
                     self.group.remove(en)
                     
