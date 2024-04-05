@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey([0, 0, 0]) #on sup le noir
         self.rect = self.image.get_rect()
         self.pos = [x,y] #position du joueur
-        self.speed = 5 #vitesse du joueur
+        self.speed = 7 #vitesse du joueur
         self.old_pos = self.pos.copy()
         #self.sprite = { }  dictionnaire des images
         self.HP = 200
@@ -20,7 +20,8 @@ class Player(pygame.sprite.Sprite):
         self.stats = 10
         self.killcount = 0
         self.range = 250
-        self.fireDelay = 3
+        self.attackDelay = 0.5
+        self.fireDelay = 0.2
 
     def go_left(self): self.pos[0] -= self.speed
 
@@ -34,6 +35,7 @@ class Player(pygame.sprite.Sprite):
     def end(self):
         if self.HP <= 0:
             print("game over")
+            print("nombre de kill : ", self.killcount)
             pygame.quit()
             exit()
 

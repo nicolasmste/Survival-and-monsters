@@ -31,9 +31,12 @@ class Play:
         self.listEnnemis = []
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
         self.coefVague = 1
+        self.nVague = 0#numéro de la vague
 
         self.listFireball = []
-        self.oldFire = 0
+
+        self.oldFire = 0#moment auquel la derniere fireBall à été tiré
+        self.oldAt = 0#moment auquel à eu lieu la derniere attaque au CAC
 
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=1 )
@@ -63,31 +66,38 @@ class Play:
         running = True
 
         while running:
-            if self.listEnnemis ==[]:
+            
+            if self.listEnnemis == []:
+                self.nVague += 1
                 for i in range(0,self.tailleVague*self.coefVague):#fait apparaitre un vague d'ennemis
                     self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
                     self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
-                self.coefVague = randint(1,3)
+                self.coefVague = randint(self.nVague,3*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
+
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
-                self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
+                self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                 
                 if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
-                    #ajout des ennemis à porté (à faire)
                     self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
                     self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
                     self.group.add(self.listFireball[-1])
                 
                 if self.listFireball != []:
                     for fir in self.listFireball:
-                        if en.dead(fir.pos) or en.dead(self.player.pos):#si l'enemis est mort
+                        if en.dead(fir.pos) or (en.dead(self.player.pos) and time.time()-self.oldAt >= self.player.attackDelay):#si l'enemis est mort tué par une firaball ou que le joueur peut l'attaquer au CAC
+                            self.oldAt = time.time()
                             self.player.killcount += 1
-                            self.listEnnemis.remove(en)
-                            self.group.remove(en)
+                            self.listEnnemis.remove(en)#on supprime l'objet de l'ennemis mort
+                            self.group.remove(en)#et on ne l'affiche plus
+                            
+                            self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
+                            self.group.remove(fir)
                             break
                 else: 
-                    if en.dead(self.player.pos):#si l'enemis est mort
+                    if en.dead(self.player.pos) and time.time()-self.oldAt >= self.player.attackDelay:
+                        self.oldAt = time.time()
                         self.player.killcount += 1
                         self.listEnnemis.remove(en)
                         self.group.remove(en)

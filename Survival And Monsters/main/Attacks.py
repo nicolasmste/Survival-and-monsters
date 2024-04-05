@@ -16,15 +16,25 @@ class fireBall(pygame.sprite.Sprite):
         self.startPos = [x,y]
         self.degat = 10
         self.range = 250
-        self.coef = (cible[1]-self.pos[1])/(cible[0]-self.pos[0])
-        self.xCible = cible[0]
-
-    def move(self):
-        self.pos[1] += self.speed * self.coef
-        if self.pos[0]>self.xCible:
-            self.pos[0] -= self.speed
+        if cible[0] == self.pos[0] :#si les coordonnées en X sont égales, évite la division par 0
+            self.coef = 0
         else :
-            self.pos[0] += self.speed 
+            self.coef = (cible[1]-self.pos[1])/(cible[0]-self.pos[0])#division par 0 si cible[0] == self.pos[0]
+        self.cible = [cible[0],cible[1]]
+
+    def move(self):#probleme (peut etre) tire n'importe où des fois
+        if self.cible[0] != self.pos[0]:
+            self.pos[1] += self.speed * self.coef
+            if self.pos[0]>self.cible[0]:
+                self.pos[0] -= self.speed
+            else :
+                self.pos[0] += self.speed
+        
+        else:#il faut juste déplacer en Y
+            if self.pos[1]>self.cible[1]:
+                self.pos[1] -= self.speed
+            else :
+                self.pos[1] += self.speed
 
     def update(self):
         self.rect.topleft = self.pos
