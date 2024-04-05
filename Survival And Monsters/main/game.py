@@ -1,10 +1,13 @@
-import pygame
+import pygame 
+import time
 from sys import exit
 import pytmx
 import pyscroll
 from player import *
+from Attacks import * 
 from ennemis import ennemi
 from random import randint
+
 
 
 class Play:
@@ -19,28 +22,29 @@ class Play:
         map_data = pyscroll.data.TiledMapData(tmx_data) 
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
         map_layer.zoom = 2
-        #print(tmx_data.get_object_by_name("image"))
-        #bordure des maps
-        # bord = []
-        # for obj in tmx_data.objects :
-        #     if obj.name == "collision":
-        #         self.bord.append(pygame.Rect(obj.x,obj.y,obj.width,obj.heigh))
         
 
 
         #générer le joueur
-        #playerpos = tmx_data.get_object_by_name("player")
-        #self.player = Player(playerpos.x,playerpos.y)
         self.player = Player(0,0)
 
         self.listEnnemis = []
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
         self.coefVague = 1
 
+        self.listFireball = []
+        self.oldFire = 0
+
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=1 )
         self.group.add(self.player)
         self.group.add(self.listEnnemis)
+
+    def distance(self,a,b):
+        x = abs(a[0] - b[0])
+        y = abs(a[1] - b[1])
+        d = sqrt(x*x + y*y)
+        return d
 
     def keybordinput(self) :
             touche = pygame.key.get_pressed() #Clavier
@@ -68,10 +72,35 @@ class Play:
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
                 self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats
-                if en.dead(self.player.pos) == True:#si l'enemis est mort
-                    self.player.killcount += 1
-                    self.listEnnemis.remove(en)
-                    self.group.remove(en)
+                
+                if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
+                    #ajout des ennemis à porté (à faire)
+                    self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
+                    self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
+                    self.group.add(self.listFireball[-1])
+                
+                if self.listFireball != []:
+                    for fir in self.listFireball:
+                        if en.dead(fir.pos) or en.dead(self.player.pos):#si l'enemis est mort
+                            self.player.killcount += 1
+                            self.listEnnemis.remove(en)
+                            self.group.remove(en)
+                            break
+                else: 
+                    if en.dead(self.player.pos):#si l'enemis est mort
+                        self.player.killcount += 1
+                        self.listEnnemis.remove(en)
+                        self.group.remove(en)
+                    
+                
+            
+            for fir in self.listFireball:
+                fir.move()
+                if self.distance(fir.startPos,fir.pos) >= fir.range:
+                    self.listFireball.remove(fir)
+                    self.group.remove(fir)
+
+        
                     
             #print("HP = ", self.player.HP)
 
