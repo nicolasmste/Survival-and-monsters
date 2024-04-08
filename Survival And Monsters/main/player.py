@@ -22,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.range = 250
         self.attackDelay = 0.5
         self.fireDelay = 0.5
+        self.invincibl = 1 #periode pendant laquelle
 
     def go_left(self): self.pos[0] -= self.speed
 

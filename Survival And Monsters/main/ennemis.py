@@ -54,8 +54,8 @@ class ennemi(pygame.sprite.Sprite):
         if (self.pos[0] == Ppos[0]) and (self.pos[1] == Ppos[1]):
             PHP -= self.attack
             print("damage HP - ",self.attack)
-            del self
-        return PHP
+            return PHP,True
+        return PHP,False
 
     def dead(self,Ppos):
         r = 13

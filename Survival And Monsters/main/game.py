@@ -37,6 +37,7 @@ class Play:
 
         self.oldFire = 0#moment auquel la derniere fireBall à été tiré
         self.oldAt = 0#moment auquel à eu lieu la derniere attaque au CAC
+        self.hitTime = 0#moment du dernier coup recu
 
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=1 )
@@ -77,7 +78,12 @@ class Play:
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
-                self.player.HP = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
+                if time.time()-self.hitTime >= self.player.invincibl:#temps d'invincibilité
+                    dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
+                    if(dam[1] == True):
+                        self.player.HP = dam[0]
+                        self.hitTime = time.time()
+                        print("hit")
                 
                 if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
                     self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
@@ -98,7 +104,7 @@ class Play:
                             
                             self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
                             self.group.remove(fir)
-                            break
+                            break#pour ne pas retirer 2 fois un ennemis de la liste
                 else: 
                     if en.dead(self.player.pos) and time.time()-self.oldAt >= self.player.attackDelay:
                         self.oldAt = time.time()
@@ -110,8 +116,6 @@ class Play:
             
             for fir in self.listFireball:
                 fir.move()
-                #print("startPos  = ",fir.startPos)
-                print("pos  = ",fir.pos)
                 if self.distance(fir.startPos,fir.pos) > self.player.range:
                     self.listFireball.remove(fir)
                     self.group.remove(fir)
