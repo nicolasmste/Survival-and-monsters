@@ -1,5 +1,5 @@
 # Survival-and-monsters
-
+il faut que la map varie en fonction de la taille de l'écran
 
 import xml.etree.ElementTree as ET
 
