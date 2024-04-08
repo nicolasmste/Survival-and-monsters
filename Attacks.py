@@ -8,7 +8,7 @@ class Attack(animations.Animations_sprites):
         super().__init__("anim_épée0")
         self.velocity = 4
         #self.image = pygame.image.load("Sprites/Move/FIREBALL.png")
-        self.rect = self.image.get_rect()
+        self.rect = self.animations.get_rect()
         self.player = player
         self.pos =[x,y]
         self.origin_image = self.image.copy()

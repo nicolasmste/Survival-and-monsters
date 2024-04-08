@@ -8,18 +8,18 @@ class Animations_sprites(pygame.sprite.Sprite) :
         self.image = pygame.image.load(f"Sprites/Move/anim_épée/{sprite_name}.png")
         self.current_image = 0
         self.image = animations.get(sprite_name)
-        self.animations= False
+        self.animation= False
 
     #définir une méthode pour démarrer l'Animations
     def start_animation(self) :
-        self.animations = True
+        self.animation = True
 
     def animate(self) :     #definir une méthode pour animer le sprite 
-        if self.animations : #vérifie si l'animation est active 
+        if self.animation : #vérifie si l'animation est active 
             self.current_image += 1
             if self.current_image >= len(self.images) :     #vérifie si on a atteint la fin de l'animation 
                 self.current_image = 0
-                self.animations = False
+                self.animation = False
             self.image = self.images[self.current_image]    #modifie l'image précédente par la suivante
 
 def load_images(sprite_name) :      #passe à l'image suivante

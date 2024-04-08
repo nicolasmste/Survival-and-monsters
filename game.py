@@ -47,7 +47,6 @@ class Play:
             if touche[pygame.K_SPACE] :
                 self.attaq.image()
                 self.attaq.update_animation()
-                
             if touche[pygame.K_z]:
                 self.player.go_up()
             if touche[pygame.K_q]:
