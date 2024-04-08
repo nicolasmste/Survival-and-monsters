@@ -44,8 +44,8 @@ class Play:
         self.group.add(self.listEnnemis)
 
     def distance(self,a,b):
-        x = abs(a[0] - b[0])
-        y = abs(a[1] - b[1])
+        x = a[0] - b[0]
+        y = a[1] - b[1]
         d = sqrt(x*x + y*y)
         return d
 
@@ -85,12 +85,16 @@ class Play:
                     self.group.add(self.listFireball[-1])
                 
                 if self.listFireball != []:
+                    #print(self.listFireball)
                     for fir in self.listFireball:
                         if en.dead(fir.pos) or (en.dead(self.player.pos) and time.time()-self.oldAt >= self.player.attackDelay):#si l'enemis est mort tué par une firaball ou que le joueur peut l'attaquer au CAC
                             self.oldAt = time.time()
-                            self.player.killcount += 1
-                            self.listEnnemis.remove(en)#on supprime l'objet de l'ennemis mort
-                            self.group.remove(en)#et on ne l'affiche plus
+                            en.HP -= fir.degat
+                            
+                            if en.HP<=0:#si l'ennemis n'a plus de pv
+                                self.player.killcount += 1
+                                self.listEnnemis.remove(en)#on supprime l'objet de l'ennemis mort
+                                self.group.remove(en)#et on ne l'affiche plus
                             
                             self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
                             self.group.remove(fir)
@@ -106,7 +110,9 @@ class Play:
             
             for fir in self.listFireball:
                 fir.move()
-                if self.distance(fir.startPos,fir.pos) >= fir.range:
+                #print("startPos  = ",fir.startPos)
+                print("pos  = ",fir.pos)
+                if self.distance(fir.startPos,fir.pos) > self.player.range:
                     self.listFireball.remove(fir)
                     self.group.remove(fir)
 

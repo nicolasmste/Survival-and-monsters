@@ -1,10 +1,11 @@
 import pygame
 from math import sqrt
+from random import randint
 
 
 class fireBall(pygame.sprite.Sprite):
 
-    def __init__(self,x,y,cible):
+    def __init__(self,x,y,ePos):
         super().__init__()
         self.sprite_sheet = pygame.image.load('Sprites/Move/Fireball.png')
         self.image = self.get_image(0, 0)
@@ -15,26 +16,36 @@ class fireBall(pygame.sprite.Sprite):
         self.pos = [x,y]
         self.startPos = [x,y]
         self.degat = 10
-        self.range = 250
-        if cible[0] == self.pos[0] :#si les coordonnées en X sont égales, évite la division par 0
+        #self.portee = 250
+        self.precision = 20
+        #self.cible = ePos
+        self.cible = [randint(ePos[0]-self.precision,ePos[0]+self.precision),randint(ePos[1]-self.precision,ePos[1]+self.precision)]
+        
+        if self.startPos[0] == self.cible[0] :#si les coordonnées en X sont égales, évite la division par 0
             self.coef = 0
         else :
-            self.coef = (cible[1]-self.pos[1])/(cible[0]-self.pos[0])#division par 0 si cible[0] == self.pos[0]
-        self.cible = [cible[0],cible[1]]
+            self.coef = (self.cible[1]-self.pos[1])/(self.cible[0]-self.pos[0])#coefficient directeur de la droite
+        
+        self.tan = sqrt((self.speed*self.speed)/(1+self.coef*self.coef))#variable qui permet d'avoir toujour la bonne vitesse de déplacement en fonction de self.speed peut importe le coef
 
-    def move(self):#probleme (peut etre) tire n'importe où des fois
+    def move(self):#tire à l'opposé qund l'ennemis est en bas à droite et en haut à gauche
         if self.cible[0] != self.pos[0]:
-            self.pos[1] += self.speed * self.coef
-            if self.pos[0]>self.cible[0]:
-                self.pos[0] -= self.speed
+            #self.pos[1] += self.speed * self.coef
+            if self.startPos[0] < self.cible[0]:
+                self.pos[1] += self.tan * self.coef
+            else:
+                self.pos[1] -= self.tan * self.coef
+            
+            if self.startPos[0]>self.cible[0]:
+                self.pos[0] -= self.tan
             else :
-                self.pos[0] += self.speed
+                self.pos[0] += self.tan
         
         else:#il faut juste déplacer en Y
-            if self.pos[1]>self.cible[1]:
-                self.pos[1] -= self.speed
+            if self.startPos[1]>self.cible[1]:
+                self.pos[1] -= self.tan
             else :
-                self.pos[1] += self.speed
+                self.pos[1] += self.tan
 
     def update(self):
         self.rect.topleft = self.pos

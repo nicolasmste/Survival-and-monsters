@@ -8,7 +8,7 @@ class ennemi(pygame.sprite.Sprite):
         self.image = self.get_image(0, 0)
         self.image.set_colorkey([0, 0, 0])
 
-        self.HP = 10
+        self.HP = 20
         self.maxHP = 10
         
         self.speed = 1

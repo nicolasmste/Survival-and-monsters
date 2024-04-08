@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.killcount = 0
         self.range = 250
         self.attackDelay = 0.5
-        self.fireDelay = 0.2
+        self.fireDelay = 0.5
 
     def go_left(self): self.pos[0] -= self.speed
 
