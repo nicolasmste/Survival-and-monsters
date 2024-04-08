@@ -16,3 +16,11 @@ def modifier_largeur_map(fichier_xml, nouvelle_largeur):
 
 # Utilisation de la fonction pour rendre la largeur variable
 modifier_largeur_map('votre_fichier.xml', 50)  # Par exemple, on change la largeur à 50
+
+
+
+
+
+
+
+
