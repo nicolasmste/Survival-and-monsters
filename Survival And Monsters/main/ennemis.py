@@ -1,5 +1,6 @@
 from typing import Any
 import pygame
+#import Attacks
 
 class ennemi(pygame.sprite.Sprite):
     def __init__(self,x,y):
@@ -8,7 +9,7 @@ class ennemi(pygame.sprite.Sprite):
         self.image = self.get_image(0, 0)
         self.image.set_colorkey([0, 0, 0])
 
-        self.HP = 20
+        self.HP = 1
         self.maxHP = 10
         
         self.speed = 1

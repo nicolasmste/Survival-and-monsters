@@ -88,6 +88,7 @@ class Play:
                 if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
                     self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
                     self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
+                    self.listFireball[-1].direction()
                     self.group.add(self.listFireball[-1])
                 
                 if self.listFireball != []:
