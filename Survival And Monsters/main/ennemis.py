@@ -25,31 +25,48 @@ class ennemi(pygame.sprite.Sprite):
 
     def moveTo(self,Px,Py):
         
-        Ex = self.pos[0]
-        Ey = self.pos[1]
-        if Ex < Px:
-            if Ex + self.speed > Px :
-                self.pos[0] = Px
-            else:
-                self.pos[0] += self.speed
+        # Ex = self.pos[0]
+        # Ey = self.pos[1]
+        # if Ex < Px:
+        #     if Ex + self.speed > Px :
+        #         self.pos[0] = Px
+        #     else:
+        #         self.pos[0] += self.speed
         
-        else:
-            if Ex - self.speed < Px :
-                self.pos[0] = Px
-            else:
-                self.pos[0] -= self.speed
+        # else:
+        #     if Ex - self.speed < Px :
+        #         self.pos[0] = Px
+        #     else:
+        #         self.pos[0] -= self.speed
         
-        if Ey < Py:
-            if Ey + self.speed > Py :
-                self.pos[1] = Py
-            else:
-                self.pos[1] += self.speed
+        # if Ey < Py:
+        #     if Ey + self.speed > Py :
+        #         self.pos[1] = Py
+        #     else:
+        #         self.pos[1] += self.speed
         
-        else:
-            if Ey - self.speed < Py:
-                self.pos[1] = Py
+        # else:
+        #     if Ey - self.speed < Py:
+        #         self.pos[1] = Py
+        #     else:
+        #         self.pos[1] -= self.speed
+        if Px != self.pos[0]:
+            #self.pos[1] += self.speed * self.coef
+            if self.pos[0] < Px:
+                self.pos[1] += self.speed * self.coef
             else:
-                self.pos[1] -= self.speed
+                self.pos[1] -= self.tan * self.coef
+            
+            if self.startPos[0]>self.cible[0]:
+                self.pos[0] -= self.tan
+            else :
+                self.pos[0] += self.tan
+        
+        else:#il faut juste déplacer en Y
+            if self.startPos[1]>self.cible[1]:
+                self.pos[1] -= self.tan
+            else :
+                self.pos[1] += self.tan
 
     def damage(self,Ppos,PHP):
         if (self.pos[0] == Ppos[0]) and (self.pos[1] == Ppos[1]):
