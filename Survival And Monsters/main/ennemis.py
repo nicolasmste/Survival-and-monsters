@@ -10,11 +10,11 @@ class ennemi(pygame.sprite.Sprite):
         self.image = self.get_image(0, 0)
         self.image.set_colorkey([0, 0, 0])
 
-        self.HP = 1
+        self.HP = 10
         self.maxHP = 10
         
-        self.speed = 1
-        self.normalSpeed = 1
+        self.speed = 5
+        self.normalSpeed = 5
         
         self.attack = 10
         self.normalAttack = 10
@@ -51,7 +51,8 @@ class ennemi(pygame.sprite.Sprite):
                 self.pos[1] += self.tan
 
     def damage(self,Ppos,PHP):
-        if (self.pos[0] == Ppos[0]) and (self.pos[1] == Ppos[1]):
+        r = 6
+        if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):
             PHP -= self.attack
             print("damage HP - ",self.attack)
             return PHP,True

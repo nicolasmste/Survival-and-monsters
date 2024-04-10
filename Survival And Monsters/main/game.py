@@ -70,9 +70,13 @@ class Play:
             
             if self.listEnnemis == []:
                 self.nVague += 1
-                for i in range(0,self.tailleVague*self.coefVague):#fait apparaitre un vague d'ennemis
+                self.tailleVague = self.tailleVague*self.coefVague
+                print("vague n°", self.nVague)
+                print("ennemis = ",self.tailleVague)
+                for i in range(0,self.tailleVague):#fait apparaitre un vague d'ennemis
                     self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
                     self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
+
                 self.coefVague = randint(self.nVague,3*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
 
             
@@ -82,6 +86,7 @@ class Play:
                     dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                     if(dam[1] == True):
                         self.player.HP = dam[0]
+                        print("HP = ", self.player.HP)
                         self.hitTime = time.time()
                         print("hit")
                 
