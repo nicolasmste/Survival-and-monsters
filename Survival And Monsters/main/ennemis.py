@@ -1,5 +1,6 @@
 from typing import Any
 import pygame
+from math import sqrt
 #import Attacks
 
 class ennemi(pygame.sprite.Sprite):
@@ -22,48 +23,29 @@ class ennemi(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 
-
     def moveTo(self,Px,Py):
         
-        # Ex = self.pos[0]
-        # Ey = self.pos[1]
-        # if Ex < Px:
-        #     if Ex + self.speed > Px :
-        #         self.pos[0] = Px
-        #     else:
-        #         self.pos[0] += self.speed
-        
-        # else:
-        #     if Ex - self.speed < Px :
-        #         self.pos[0] = Px
-        #     else:
-        #         self.pos[0] -= self.speed
-        
-        # if Ey < Py:
-        #     if Ey + self.speed > Py :
-        #         self.pos[1] = Py
-        #     else:
-        #         self.pos[1] += self.speed
-        
-        # else:
-        #     if Ey - self.speed < Py:
-        #         self.pos[1] = Py
-        #     else:
-        #         self.pos[1] -= self.speed
+        if self.pos[0] == Px :#si les coordonnées en X sont égales, évite la division par 0
+            coef = 0
+        else :
+            coef = (Py-self.pos[1])/(Px-self.pos[0])#coefficient directeur de la droite
+
+        self.tan = sqrt((self.speed*self.speed)/(1+coef*coef))
+
         if Px != self.pos[0]:
             #self.pos[1] += self.speed * self.coef
             if self.pos[0] < Px:
-                self.pos[1] += self.speed * self.coef
+                self.pos[1] += self.tan * coef
             else:
-                self.pos[1] -= self.tan * self.coef
+                self.pos[1] -= self.tan * coef
             
-            if self.startPos[0]>self.cible[0]:
+            if self.pos[0]>Px:
                 self.pos[0] -= self.tan
             else :
                 self.pos[0] += self.tan
         
         else:#il faut juste déplacer en Y
-            if self.startPos[1]>self.cible[1]:
+            if self.pos[1]>Py:
                 self.pos[1] -= self.tan
             else :
                 self.pos[1] += self.tan

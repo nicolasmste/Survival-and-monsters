@@ -19,7 +19,7 @@ class fireBall(pygame.sprite.Sprite):
         #self.portee = 250
         self.precision = 0#plus elle est basse plus il est précis, plus l'écart es faible
         #self.cible = ePos
-        self.cible = [randint(ePos[0]-self.precision,ePos[0]+self.precision),randint(ePos[1]-self.precision,ePos[1]+self.precision)]
+        self.cible = [randint(int(ePos[0]-self.precision),int(ePos[0]+self.precision)),randint(int(ePos[1]-self.precision),int(ePos[1]+self.precision))]
         
         if self.startPos[0] == self.cible[0] :#si les coordonnées en X sont égales, évite la division par 0
             self.coef = 0
