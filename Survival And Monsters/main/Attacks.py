@@ -1,5 +1,5 @@
 import pygame
-from math import sqrt,tan,degrees
+from math import sqrt,acos,degrees
 from random import randint
 
 
@@ -12,10 +12,10 @@ class fireBall(pygame.sprite.Sprite):
         self.image.set_colorkey([0, 0, 0])
         self.rect = self.image.get_rect()
 
-        self.speed = 10
+        self.speed = 4
         self.pos = [x,y]
         self.startPos = [x,y]
-        self.degat = 10
+        self.degat = 5
         #self.portee = 250
         self.precision = 0#plus elle est basse plus il est précis, plus l'écart es faible
         #self.cible = ePos
@@ -30,20 +30,16 @@ class fireBall(pygame.sprite.Sprite):
 
 
     def direction(self):
-        if self.startPos[1] == self.cible[1]:
-            if self.startPos[0] > self.cible[0]:
-                self.image = pygame.transform.rotate(self.image,180)
-        
-        elif self.startPos[0] == self.cible[0]:
-            if self.startPos[1] > self.cible[1]:
-                self.image = pygame.transform.rotate(self.image,-90)
-            else :
-                self.image = pygame.transform.rotate(self.image,90)
-        else :
-            adj = abs(self.startPos[0] - self.cible[0])#longueur de l'angle adjacent
-            opp = abs(self.startPos[1] - self.cible[1])#longueur de l'angle opposé
-            angle = degrees(tan(opp/adj))
-            self.image = pygame.transform.rotate(self.image,-angle)
+        #mieux d'utiliser le cos
+        adj = self.cible[0] - self.startPos[0]
+        opp = self.cible[1] - self.startPos[1]
+        hypo = sqrt(adj*adj + opp*opp)
+        #cos t = adj/hypo
+        angle = degrees(acos(adj/hypo))
+        if opp > 0:
+            angle = -angle
+        self.image = pygame.transform.rotate(self.image,angle)
+
 
     def move(self):#tire à l'opposé qund l'ennemis est en bas à droite et en haut à gauche
         

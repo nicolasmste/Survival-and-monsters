@@ -13,7 +13,7 @@ class ennemi(pygame.sprite.Sprite):
         self.HP = 10
         self.maxHP = 10
         
-        self.speed = 5
+        self.speed = 2
         self.normalSpeed = 5
         
         self.attack = 10
@@ -54,7 +54,7 @@ class ennemi(pygame.sprite.Sprite):
         r = 6
         if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):
             PHP -= self.attack
-            print("damage HP - ",self.attack)
+            #print("damage HP - ",self.attack)
             return PHP,True
         return PHP,False
 

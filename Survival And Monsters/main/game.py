@@ -13,7 +13,7 @@ from random import randint
 class Play:
 
     def __init__(self): #fenêtre du jeu
-        
+        tailleMap = [925,605]
         self.screen = pygame.display.set_mode((1280, 768))
         pygame.display.set_caption("Ninja") 
         
@@ -23,7 +23,7 @@ class Play:
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
         map_layer.zoom = 2
         
-
+        #print(map_data)
 
         #générer le joueur
         self.player = Player(0,0)
@@ -62,18 +62,22 @@ class Play:
                 self.player.go_down()
 
     def run(self):
+        
         clock = pygame.time.Clock() #Objet de type horloge
         #Boucle de run, (exit permet de sortir de la boucle quand on ferme la fenêtre)
         running = True
 
         while running:
+            #print(self.player.pos)
             
-            if self.listEnnemis == []:
+            if self.listEnnemis == []:#4eme vague avec 180 elements = pas un peu beaucoup
                 self.nVague += 1
                 self.tailleVague = self.tailleVague*self.coefVague
                 print("vague n°", self.nVague)
                 print("ennemis = ",self.tailleVague)
-                for i in range(0,self.tailleVague):#fait apparaitre un vague d'ennemis
+                for i in range(0,self.tailleVague):#fait apparaitre un vague d'ennemisfaire
+                    #faire apparaitre les ennemis hors de la map
+                    
                     self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
                     self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
 
@@ -86,9 +90,9 @@ class Play:
                     dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                     if(dam[1] == True):
                         self.player.HP = dam[0]
-                        print("HP = ", self.player.HP)
+                        #print("HP = ", self.player.HP)
                         self.hitTime = time.time()
-                        print("hit")
+                        #print("hit")
                 
                 if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
                     self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
@@ -133,6 +137,7 @@ class Play:
             self.keybordinput()
             self.group.update() #update position du joueur
             self.group.center(self.player.rect)
+            
             pygame.display.update()
             self.group.draw(self.screen)
             clock.tick(30) #limiter les FPS
