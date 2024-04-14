@@ -71,16 +71,19 @@ class Play:
             #print(self.player.pos)
             
             if self.listEnnemis == []:#4eme vague avec 180 elements = pas un peu beaucoup
+                aRemplir = True
                 self.nVague += 1
                 self.tailleVague = self.tailleVague*self.coefVague
                 print("vague n°", self.nVague)
                 print("ennemis = ",self.tailleVague)
-                for i in range(0,self.tailleVague):#fait apparaitre un vague d'ennemisfaire
-                    #faire apparaitre les ennemis hors de la map
-                    
-                    self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
-                    self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
+                #faire apparaitre les ennemis hors de la map
 
+            if aRemplir == True:   
+                self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
+                self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
+
+            if len(self.listEnnemis) == self.tailleVague:
+                aRemplir = False
                 self.coefVague = randint(self.nVague,3*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
 
             
@@ -94,7 +97,7 @@ class Play:
                         self.hitTime = time.time()
                         #print("hit")
                 
-                if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
+                if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
                     self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
                     self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
                     self.listFireball[-1].direction()
