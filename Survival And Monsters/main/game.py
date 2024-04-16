@@ -5,6 +5,7 @@ import pytmx
 import pyscroll
 from player import *
 from Attacks import * 
+from sound import sound
 from ennemis import ennemi
 from random import randint
 
@@ -22,16 +23,20 @@ class Play:
         map_data = pyscroll.data.TiledMapData(tmx_data) 
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
         map_layer.zoom = 2
-        
-        #print(map_data)
 
         #générer le joueur
         self.player = Player(0,0)
+        self.music = sound()
 
         self.listEnnemis = []
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
         self.coefVague = 1
         self.nVague = 0#numéro de la vague
+
+        self.listEtape = [1,2]#liste des vagues où la musique évolue
+        #faire qqchose quand onn arrive à la fin de la liste pour éviter index out of range
+        self.nbMus = len(self.listEtape)
+        self.etape = 0
 
         self.listFireball = []
 
@@ -67,12 +72,18 @@ class Play:
         #Boucle de run, (exit permet de sortir de la boucle quand on ferme la fenêtre)
         running = True
 
+        
         while running:
             #print(self.player.pos)
             
             if self.listEnnemis == []:#4eme vague avec 180 elements = pas un peu beaucoup
                 aRemplir = True
                 self.nVague += 1
+
+                if self.etape < self.nbMus and self.nVague >=self.listEtape[self.etape]:
+                    self.music.play(self.music.listMus[self.etape])
+                    self.etape += 1
+
                 self.tailleVague = self.tailleVague*self.coefVague
                 print("vague n°", self.nVague)
                 print("ennemis = ",self.tailleVague)
@@ -84,8 +95,8 @@ class Play:
 
             if len(self.listEnnemis) == self.tailleVague:
                 aRemplir = False
-                self.coefVague = randint(self.nVague,3*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
-
+                self.coefVague = randint(self.nVague,2*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
+                #faire en soret que ya des nombres à virgule
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis

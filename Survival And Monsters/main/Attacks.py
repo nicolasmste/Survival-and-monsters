@@ -17,7 +17,7 @@ class fireBall(pygame.sprite.Sprite):
         self.startPos = [x,y]
         self.degat = 5
         #self.portee = 250
-        self.precision = 0#plus elle est basse plus il est précis, plus l'écart es faible
+        self.precision = 4#plus elle est basse plus il est précis, plus l'écart es faible
         #self.cible = ePos
         self.cible = [randint(int(ePos[0]-self.precision),int(ePos[0]+self.precision)),randint(int(ePos[1]-self.precision),int(ePos[1]+self.precision))]
         
@@ -34,8 +34,12 @@ class fireBall(pygame.sprite.Sprite):
         adj = self.cible[0] - self.startPos[0]
         opp = self.cible[1] - self.startPos[1]
         hypo = sqrt(adj*adj + opp*opp)
-        #cos t = adj/hypo
-        angle = degrees(acos(adj/hypo))
+        
+        if(hypo == 0):#evite la division par 0
+            angle = 0
+        else:
+            angle = degrees(acos(adj/hypo))
+        
         if opp > 0:
             angle = -angle
         self.image = pygame.transform.rotate(self.image,angle)
