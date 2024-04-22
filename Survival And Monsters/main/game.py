@@ -33,7 +33,7 @@ class Play:
         self.coefVague = 1
         self.nVague = 0#numéro de la vague
 
-        self.listEtape = [1,2]#liste des vagues où la musique évolue
+        self.listEtape = [1,3]#liste des vagues où la musique évolue
         #faire qqchose quand onn arrive à la fin de la liste pour éviter index out of range
         self.nbMus = len(self.listEtape)
         self.etape = 0
