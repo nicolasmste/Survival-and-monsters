@@ -1,23 +1,35 @@
 from typing import Any
 import pygame
 from math import sqrt
+from Attributes import *
+from random import randint
 #import Attacks
+
+types = [slime(),kingslime(),Orc(),Bat()]
+def newtype():
+    return types[randint(0,3)]
 
 class ennemi(pygame.sprite.Sprite):
     def __init__(self,x,y):
         super().__init__()
-        self.sprite_sheet = pygame.image.load('Sprites/Slime/New Piskel (2).png')
+
+        self.sprite_sheet = pygame.image.load('Sprites/Tengu/Tengu.png')
         self.image = self.get_image(0, 0)
         self.image.set_colorkey([0, 0, 0])
 
-        self.HP = 10
-        self.maxHP = 10
+        self.type = newtype()
+
+        self.image = self.type.image
+        self.givenxp = 2
+
+        self.HP = self.type.HP
+        self.maxHP = self.type.maxHP
         
-        self.speed = 2
-        self.normalSpeed = 5
+        self.speed = self.type.speed
+        self.normalSpeed = self.type.normalSpeed
         
-        self.attack = 10
-        self.normalAttack = 10
+        self.attack = self.type.attack
+        self.normalAttack = self.type.normalAttack
 
         self.pos = [x,y]
         self.rect = self.image.get_rect()

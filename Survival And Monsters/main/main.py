@@ -9,6 +9,7 @@ if __name__ == '__main__':
         print("le fichier Score.csv à été crée dans main")
     else :
          print("le fichier existait deja")
+    
     pygame.init()   #initialisation du jeu
     game = Play()
     game.run()
