@@ -7,6 +7,7 @@ from player import *
 from Attacks import * 
 from sound import sound
 from ennemis import ennemi
+import fileFonc
 from random import randint
 
 
@@ -27,6 +28,7 @@ class Play:
         #générer le joueur
         self.player = Player(0,0)
         self.music = sound()
+        self.zoneS = zoneAf()
 
         self.listEnnemis = []
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
@@ -82,18 +84,20 @@ class Play:
                 self.player.go_down()
             if touche[pygame.K_SPACE] and self.delay(self.oldZone,self.player.zoneDelay):
                 self.player.isZone = True
-                self.screen.blit(pygame.image.load('Sprites/Move/zoneAttack.png'),self.player.pos)#affiche l'image de l'attaque de zone
+                self.zoneS.pos = self.player.pos
+                self.zoneS.resize(self.player.zoneRange)
+                self.group.add(self.zoneS)
+                #self.screen.blit(self.player.resize(),self.player.pos)#affiche l'image de l'attaque de zone
                 print("Zone attack")
-                
+
     def run(self):
         
         clock = pygame.time.Clock() #Objet de type horloge
         #Boucle de run, (exit permet de sortir de la boucle quand on ferme la fenêtre)
         running = True
 
-        
+        self.timeStart = time.time()
         while running:
-            #print(self.player.pos)
             
             if self.listEnnemis == []:#4eme vague avec 180 elements = un peu beaucoup
                 aRemplir = True
@@ -156,6 +160,7 @@ class Play:
             
             if self.player.isZone == True:
                 self.player.isZone = False
+                self.group.remove(self.zoneS)#on désafiche l'image de la zone
                 self.oldZone = time.time()#si on le met avant seul le premier ennemis sera touché car oldZone s'actualise donc le delai va etre trop petit
             
             for fir in self.listFireball:
@@ -176,7 +181,25 @@ class Play:
             pygame.display.update()
             self.group.draw(self.screen)
             clock.tick(30) #limiter les FPS
-            self.player.end()#On verifie si le joueur à toujour des pv
+            if self.player.end():#On verifie si le joueur à toujour des pv
+                self.timeEnd = time.time()
+                self.gameTime = self.timeEnd - self.timeStart
+                scorefile = open("main/Score.csv","r")
+                maxscore = -1
+                for i in scorefile:
+                    s = int(i.split(";")[0])
+                    if s >= maxscore:
+                        maxscore = s
+                if self.player.killcount > maxscore:
+                    print("\nBravo nouveau record de kill\n",self.player.killcount)
+                scorefile.close()
+
+                scorefile = open("main/Score.csv","a")
+                scorefile.write(f"{self.player.killcount};{self.gameTime};{self.nVague};lvl\n")
+                scorefile.close()
+                
+                pygame.quit()
+                exit()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
                     pygame.quit()

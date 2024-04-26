@@ -73,5 +73,24 @@ class fireBall(pygame.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 32)) #Origine du crop et coordonnées de fin du crop
         return image
     
-    
+class zoneAf(pygame.sprite.Sprite):
+    def __init__(self):
+
+        super().__init__()
+        self.zoneImage = pygame.image.load('Sprites/Move/zoneAttack.png')#image fait 1000x1000 
+        self.image = self.get_image(0, 0)
         
+        self.rect = self.image.get_rect()
+
+        self.pos = [0,0]
+  
+    def resize(self,ran):#redimentionne l'image
+        self.zoneImage = pygame.transform.scale_by(self.zoneImage,ran/500)
+        
+    def update(self):
+       self.rect.topleft = self.pos
+
+    def get_image(self, x, y):
+        image = pygame.Surface([32, 32]) #surface occupée sur le jeu
+        image.blit(self.zoneImage, (0, 0), (x, y, 32, 32)) #Origine du crop et coordonnées de fin du crop
+        return image
