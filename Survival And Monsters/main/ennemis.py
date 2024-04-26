@@ -58,10 +58,11 @@ class ennemi(pygame.sprite.Sprite):
             return PHP,True
         return PHP,False
 
-    def dead(self,Ppos):
+    def hit(self,Ppos):
         r = 13
         if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):#si la position en X est compris entre PosPx + a et PosPx -a
             return True
+        return False
 
     def update(self):
         self.rect.topleft = self.pos 

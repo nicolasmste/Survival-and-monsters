@@ -17,11 +17,20 @@ class Player(pygame.sprite.Sprite):
         #self.sprite = { }  dictionnaire des images
         self.HP = 200
         self.maxHP = 200
-        self.stats = 10
+        self.degat = 10
+
+        
         self.killcount = 0
+        
         self.range = 250
         self.attackDelay = 0.5
-        self.fireDelay = 0.5
+        self.fireDelay = 10
+        
+        self.zoneDelay = 0.5
+        self.zoneRange = 150# cercle de 150 px de rayon
+        self.zoneDegat = 50
+        self.zoneSpeed  = 10#vitesse à laquelle la zone grossi
+        self.isZone = False# booléen ppour savoir si une attaque de zone est lancé
         self.invincibl = 1 #periode pendant laquelle
 
     def go_left(self): self.pos[0] -= self.speed
@@ -31,7 +40,6 @@ class Player(pygame.sprite.Sprite):
     def go_up(self): self.pos[1] -= self.speed
 
     def go_down(self): self.pos[1] += self.speed
-
 
     def end(self):
         if self.HP <= 0:

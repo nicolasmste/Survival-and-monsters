@@ -14,7 +14,7 @@ from random import randint
 class Play:
 
     def __init__(self): #fenêtre du jeu
-        tailleMap = [925,605]
+        self.tailleMap = [925,605]
         self.screen = pygame.display.set_mode((1280, 768))
         pygame.display.set_caption("Ninja") 
         
@@ -43,6 +43,7 @@ class Play:
         self.oldFire = 0#moment auquel la derniere fireBall à été tiré
         self.oldAt = 0#moment auquel à eu lieu la derniere attaque au CAC
         self.hitTime = 0#moment du dernier coup recu
+        self.oldZone = 0#moment de la derniere attacke de zone
 
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=1 )
@@ -54,6 +55,20 @@ class Play:
         y = a[1] - b[1]
         d = sqrt(x*x + y*y)
         return d
+    
+    def delay(self,old,d):
+        if time.time() - old >= d:
+            return True
+        return False
+    
+    def kill(self,ennemi,degat):#enleve de la vie à l'ennemis, si il est mort, on le supprime et ont ajoute 1 au kill count
+        ennemi.HP -= degat
+        if ennemi.HP<=0:#si l'ennemis n'a plus de pv
+            self.player.killcount += 1
+            self.listEnnemis.remove(ennemi)#on supprime l'objet de l'ennemis mort
+            self.group.remove(ennemi)#et on ne l'affiche plus
+            return True
+        return False
 
     def keybordinput(self) :
             touche = pygame.key.get_pressed() #Clavier
@@ -65,7 +80,11 @@ class Play:
                 self.player.go_right()
             if touche[pygame.K_DOWN]:
                 self.player.go_down()
-
+            if touche[pygame.K_SPACE] and self.delay(self.oldZone,self.player.zoneDelay):
+                self.player.isZone = True
+                self.screen.blit(pygame.image.load('Sprites/Move/zoneAttack.png'),self.player.pos)#affiche l'image de l'attaque de zone
+                print("Zone attack")
+                
     def run(self):
         
         clock = pygame.time.Clock() #Objet de type horloge
@@ -76,7 +95,7 @@ class Play:
         while running:
             #print(self.player.pos)
             
-            if self.listEnnemis == []:#4eme vague avec 180 elements = pas un peu beaucoup
+            if self.listEnnemis == []:#4eme vague avec 180 elements = un peu beaucoup
                 aRemplir = True
                 self.nVague += 1
 
@@ -96,53 +115,55 @@ class Play:
             if len(self.listEnnemis) == self.tailleVague:
                 aRemplir = False
                 self.coefVague = randint(self.nVague,2*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
-                #faire en soret que ya des nombres à virgule
+                #faire en sorte que qu'il y ai des nombres à virgule
             
             for en in self.listEnnemis :
                 en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
-                if time.time()-self.hitTime >= self.player.invincibl:#temps d'invincibilité
+                if self.delay(self.hitTime,self.player.invincibl):#temps d'invincibilité
                     dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                     if(dam[1] == True):
                         self.player.HP = dam[0]
                         #print("HP = ", self.player.HP)
                         self.hitTime = time.time()
                         #print("hit")
-                
-                if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
+
+                if self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
                     self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
                     self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
                     self.listFireball[-1].direction()
-                    self.group.add(self.listFireball[-1])
-                
+                    self.group.add(self.listFireball[-1])            
+
                 if self.listFireball != []:
-                    #print(self.listFireball)
+                    
                     for fir in self.listFireball:
-                        if en.dead(fir.pos) or (en.dead(self.player.pos) and time.time()-self.oldAt >= self.player.attackDelay):#si l'enemis est mort tué par une firaball ou que le joueur peut l'attaquer au CAC
+                        if en.hit(fir.pos) or (en.hit(self.player.pos) and self.delay(self.oldAt,self.player.attackDelay)):#si l'enemis est mort tué par une firaball ou que le joueur peut l'attaquer au CAC
                             self.oldAt = time.time()
-                            en.HP -= fir.degat
-                            
-                            if en.HP<=0:#si l'ennemis n'a plus de pv
-                                self.player.killcount += 1
-                                self.listEnnemis.remove(en)#on supprime l'objet de l'ennemis mort
-                                self.group.remove(en)#et on ne l'affiche plus
-                            
+                            self.kill(en,fir.degat)
                             self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
                             self.group.remove(fir)
                             break#pour ne pas retirer 2 fois un ennemis de la liste
                 else: 
-                    if en.dead(self.player.pos) and time.time()-self.oldAt >= self.player.attackDelay:
+                    if en.hit(self.player.pos) and self.delay(self.oldAt,self.player.attackDelay):
                         self.oldAt = time.time()
-                        self.player.killcount += 1
-                        self.listEnnemis.remove(en)
-                        self.group.remove(en)
-                    
-                
+                        self.kill(en,self.player.degat)
+
+                    elif self.player.isZone == True:
+                        if(self.distance(self.player.pos,en.pos)<= self.player.zoneRange):
+                            
+                            self.kill(en,self.player.zoneDegat)
+                            #faire l'attaque de zone et apres la boucle mettre isZone à false
+                            
+            
+            if self.player.isZone == True:
+                self.player.isZone = False
+                self.oldZone = time.time()#si on le met avant seul le premier ennemis sera touché car oldZone s'actualise donc le delai va etre trop petit
             
             for fir in self.listFireball:
                 fir.move()
                 if self.distance(fir.startPos,fir.pos) > self.player.range:
                     self.listFireball.remove(fir)
                     self.group.remove(fir)
+
 
         
                     

@@ -11,7 +11,7 @@ class fireBall(pygame.sprite.Sprite):
         self.image = self.get_image(0, 0)
         self.image.set_colorkey([0, 0, 0])
         self.rect = self.image.get_rect()
-
+        
         self.speed = 4
         self.pos = [x,y]
         self.startPos = [x,y]
@@ -72,3 +72,6 @@ class fireBall(pygame.sprite.Sprite):
         image = pygame.Surface([32, 32]) #surface occupée sur le jeu
         image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 32)) #Origine du crop et coordonnées de fin du crop
         return image
+    
+    
+        
