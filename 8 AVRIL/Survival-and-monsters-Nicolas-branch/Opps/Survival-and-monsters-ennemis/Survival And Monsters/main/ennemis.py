@@ -25,6 +25,7 @@ class ennemi(pygame.sprite.Sprite):
         
         self.attack = self.type.attack
         self.normalAttack = self.type.normalAttack
+        
 
         self.pos = [x,y]
         self.rect = self.image.get_rect()

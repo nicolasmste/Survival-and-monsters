@@ -6,7 +6,8 @@ import pyscroll
 from player import *
 from Attacks import * 
 from ennemis import ennemi
-from random import randint
+from itemspawn import effect
+from random import randint,choices
 from SFX import Sound
 from hpbar import HPbar
 from menu import *
@@ -31,7 +32,9 @@ class Play:
         map_data = pyscroll.data.TiledMapData(tmx_data) 
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
         self.map_layer.zoom = 2
-    
+ 
+
+
     def game_init(self):
         
         #générer le joueur
@@ -39,6 +42,7 @@ class Play:
         self.hpbar = HPbar(self.player.pos[0],self.player.pos[1],self.player.ratio,self.player.speed)
         self.xpbar = XPbar(self.player.pos[0],self.player.pos[1],self.player.xpratio)
         self.listEnnemis = []
+        self.listitems = []
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
         self.coefVague = 1
         self.nVague = 0 #numéro de la vague
@@ -50,6 +54,7 @@ class Play:
         self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=1 )
         self.group.add(self.player)
         self.group.add(self.listEnnemis)
+        self.group.add(self.listitems)
         self.group.add(self.hpbar)
  
 
@@ -101,10 +106,7 @@ class Play:
         self.screen.blit(self.menu.volumeplus,self.menu.plusbutton)
         self.screen.blit(self.menu.volumeminus,self.menu.minusbutton)
 
-        
-                
-      
-
+    
 
     def run(self):
         clock = pygame.time.Clock() #Objet de type horloge
@@ -119,6 +121,8 @@ class Play:
                 
                 if self.listEnnemis == []:
                     self.nVague += 1
+                    self.listitems.append(effect(randint(0,1000),randint(0,600)))
+                    self.group.add(self.listitems[-1])
                     for i in range(0,self.tailleVague*self.coefVague):#fait apparaitre un vague d'ennemis
                         self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
                         self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
@@ -132,6 +136,7 @@ class Play:
                     if self.distance(self.player.pos , en.pos) <= self.player.range and time.time()-self.oldFire >= self.player.fireDelay:#si un ennemis est dans la range on tire si l'attaque est rechargé
                         self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
                         self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
+                        
                         self.sfx.explosion.play()  #bruit des explosion 
                         self.group.add(self.listFireball[-1])
 
@@ -170,6 +175,10 @@ class Play:
                     if self.distance(fir.startPos,fir.pos) >= fir.range:
                         self.listFireball.remove(fir)
                         self.group.remove(fir)
+
+                for items in self.listitems:
+                    if pygame.sprite.collide_rect(items,self.player) :
+                        self.group.remove(items)
                 
                 
                 self.keybordinput()
