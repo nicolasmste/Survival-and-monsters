@@ -183,7 +183,7 @@ class Play:
             
 
             if self.animation == True :
-                print("aaaaaaaaaa")
+                #print("aaaaaaaaaa")
                 if self.num_anim >= self.épée.taille_anim :
                     self.animation = False
                     self.group.remove(self.épée)
@@ -193,7 +193,7 @@ class Play:
                     self.group.add(self.épée)
                     self.num_anim += 1
                     self.épée.image = pygame.image.load(f"Sprites/Move/anim_épée/anim_épée{self.num_anim}.png")
-                    print(self.num_anim)
+                    #print(self.num_anim)
                     #self.animation = False
                 
                     

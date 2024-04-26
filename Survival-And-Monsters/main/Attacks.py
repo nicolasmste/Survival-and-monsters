@@ -13,12 +13,6 @@ class Attack(animations.Animations_sprites):
         self.pos =[]
         self.origin_image = self.image.copy()
         self.angle = 0
-
-
-    def update_animation(self) :  # permet de lancer l'animation
-        self.animate()
-
-    
     
     def update(self):#actualisation de la position
         self.rect.topleft = self.pos  #position
