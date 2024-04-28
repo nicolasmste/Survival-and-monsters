@@ -1,5 +1,5 @@
 import pygame 
-import time
+from time import time
 from sys import exit
 import pytmx
 import pyscroll
@@ -8,14 +8,16 @@ from Attacks import *
 from animations import *
 from sound import sound
 from ennemis import ennemi
-import fileFonc
 from itemspawn import effect
 from random import randint,choices
-from SFX import Sound
 from hpbar import HPbar
 from menu import *
 from Xpbar import XPbar
 
+#a faire :
+#   les items
+#   régler le problème de la souris (si je trouve où c'est)
+#
 
 class Play:
 
@@ -69,8 +71,6 @@ class Play:
         self.hitTime = 0#moment du dernier coup recu
         self.oldZone = 0#moment de la derniere attacke de zone
 
-        self.sfx = Sound()
-
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=1 )
         self.group.add(self.player)
@@ -85,7 +85,7 @@ class Play:
         return d
     
     def delay(self,old,d):
-        if time.time() - old >= d:
+        if time() - old >= d:
             return True
         return False
     
@@ -131,7 +131,7 @@ class Play:
                 self.zoneS.pos = self.player.pos
                 self.zoneS.resize(self.player.zoneRange)
                 self.group.add(self.zoneS)
-                #self.screen.blit(self.player.resize(),self.player.pos)#affiche l'image de l'attaque de zone
+                #affiche l'image de l'attaque de zone
                 print("Zone attack")
 
     def Startmenu(self):
@@ -164,7 +164,7 @@ class Play:
         clock = pygame.time.Clock() #Objet de type horloge
         #Boucle de run, (exit permet de sortir de la boucle quand on ferme la fenêtre)
         running = True
-        self.timeStart = time.time()
+        self.timeStart = time()
         
         while running:
 
@@ -177,7 +177,6 @@ class Play:
                     self.group.add(self.listitems[-1])
 
                     if self.etape < self.nbMus and self.nVague >=self.listEtape[self.etape]:
-                        print("channeles : ",pygame.mixer.get_num_channels())
                         self.music.play(self.music.listMus[self.etape])
                         self.etape += 1
 
@@ -201,14 +200,15 @@ class Play:
                         dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                         if(dam[1] == True):
                             self.player.HP = dam[0]
-                            self.hitTime = time.time()
+                            self.hitTime = time()
 
 
                     if self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
-                        self.oldFire = time.time()#actualisation de la derniere fois que l'on à tir
+                        self.oldFire = time()#actualisation de la derniere fois que l'on à tir
                         self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
                         self.listFireball[-1].direction()
-                        self.group.add(self.listFireball[-1])            
+                        self.group.add(self.listFireball[-1])
+                        self.music.explosion.play()         
 
                     if self.listFireball != []:                      
                         for fir in self.listFireball:
@@ -221,7 +221,7 @@ class Play:
                                 break#pour ne pas retirer 2 fois un ennemis de la liste
                     else: 
                         if en.hit(self.player.pos) and self.delay(self.oldAt,self.player.attackDelay):#si le joueur attaque un ennemis au CAC
-                            self.oldAt = time.time()
+                            self.oldAt = time()
                             self.kill(en,self.player.degat)
                             if self.animation  == False :
                                 self.animation = True
@@ -239,7 +239,7 @@ class Play:
                 if self.player.isZone == True:
                     self.player.isZone = False
                     self.group.remove(self.zoneS)#on désafiche l'image de la zone
-                    self.oldZone = time.time()#si on le met avant seul le premier ennemis sera touché car oldZone s'actualise donc le delai va etre trop petit
+                    self.oldZone = time()#si on le met avant seul le premier ennemis sera touché car oldZone s'actualise donc le delai va etre trop petit
                 
                 for fir in self.listFireball:
                     fir.move()
@@ -275,24 +275,8 @@ class Play:
                 self.screen.blit(self.xpbar.image,self.xpbar.rect)
                 self.screen.blit(self.menu.pausebutton,self.menu.pauserect)
                 
-                if self.player.end():#On verifie si le joueur à toujour des pv
+                if self.player.end(self.timeStart,time(),self.nVague):#On verifie si le joueur à toujour des pv
                     pygame.mixer.music.stop()
-                    self.timeEnd = time.time()
-                    self.gameTime = self.timeEnd - self.timeStart
-                    scorefile = open("main/Score.csv","r")
-                    maxscore = -1
-                    for i in scorefile:
-                        s = int(i.split(";")[0])
-                        if s >= maxscore:
-                            maxscore = s
-                    if self.player.killcount > maxscore:
-                        print("\nBravo nouveau record de kill\n",self.player.killcount)
-                    scorefile.close()
-
-                    scorefile = open("main/Score.csv","a")
-                    scorefile.write(f"{self.player.killcount};{self.gameTime};{self.nVague};lvl\n")
-                    scorefile.close()
-                    
                     pygame.mouse.set_visible(True)
                     self.menu.gameover = True
                     self.menu.PLAY = False

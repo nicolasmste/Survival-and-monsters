@@ -1,7 +1,8 @@
 from typing import Any
 import pygame
 from Attacks import *
-from math import ceil 
+from math import ceil
+from time import time
 
 class Player(pygame.sprite.Sprite):
 
@@ -18,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.old_pos = self.pos.copy()
         self.HP = 200
         self.maxHP = 200
-        self.degat = 5
+        self.degat = 20
         self.ratio = self.HP / self.maxHP
 
         #barre de vie
@@ -39,8 +40,8 @@ class Player(pygame.sprite.Sprite):
         self.killcount = 0
         
         self.range = 250
-        self.attackDelay = 0.5
-        self.fireDelay = 10
+        self.attackDelay = 0.25
+        self.fireDelay = 1
         
         self.zoneDelay = 0.5
         self.zoneRange = 150# cercle de 150 px de rayon
@@ -64,8 +65,23 @@ class Player(pygame.sprite.Sprite):
 
     def go_down(self): self.pos[1] += self.speed
 
-    def end(self):
+    def end(self,startT,endT,vague):
         if self.HP <= 0:
+            gameTime = endT - startT
+            scorefile = open("main/Score.csv","r")
+            maxscore = -1
+            
+            for i in scorefile:
+                s = int(i.split(";")[0])
+                if s >= maxscore:
+                    maxscore = s
+            if self.killcount > maxscore:
+                print("\nBravo nouveau record de kill\n",self.killcount)
+            scorefile = open("main/Score.csv","a")
+            scorefile.write(f"{self.killcount};{gameTime};{vague};lvl\n")
+            scorefile.close()
+            scorefile.close()
+
             print("game over")
             print("nombre de kill : ", self.killcount)
             return True
@@ -78,6 +94,10 @@ class Player(pygame.sprite.Sprite):
             
 
     def update(self):#actualisation de la position
+        if self.HP < 0: 
+            self.HP = 0
+        self.xpratio = self.XP / self.maxXP
+        self.ratio = self.HP / self.maxHP
         self.rect.topleft = self.pos  #position
 
     def get_image(self, myimage, x, y, x1, y1):

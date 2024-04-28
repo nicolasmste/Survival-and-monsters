@@ -5,7 +5,9 @@ import pygame
 class sound :
 
     def __init__(self):
+        self.explosion = pygame.mixer.Sound("SFX/EXPLOSION.wav")
         self.listMus = ["music/ZOO.mp3","music/DLD.mp3"]
+        
 
     def play(self,mus):
         self.music = pygame.mixer_music.load(mus)
