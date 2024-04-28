@@ -52,10 +52,3 @@ class Menu:
         self.gorect = self.gameoverscreen.get_rect()
         self.gorect.x = screen.get_width()/3
         self.gorect.y = (screen.get_height()/7)
-
-
-        
-
-
-    
-  

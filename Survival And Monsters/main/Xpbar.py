@@ -18,7 +18,7 @@ class XPbar():
 
     
     def update(self):#actualisation de la position
-        print(f"AAAAAARATIO AA{self.ratio}")
+        #print(f"AAAAAARATIO AA{self.ratio}")
     
         self.image = self.XPIMAGES[floor(self.ratio*26)]
         self.image.set_colorkey([0, 0, 0])

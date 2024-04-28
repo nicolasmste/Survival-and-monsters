@@ -71,7 +71,7 @@ class ennemi(pygame.sprite.Sprite):
         return PHP,False
 
     def hit(self,Ppos):
-        r = 13
+        r = 13#doit dépendre de l'enemis
         if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):#si la position en X est compris entre PosPx + a et PosPx -a
             return True
         return False

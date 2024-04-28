@@ -45,8 +45,8 @@ class Orc():
         self.sprite_sheet = pygame.image.load('Sprites/ORC/ORC.png')
         self.image = get_image(self.sprite_sheet,0, 0,64,64)
         self.image.set_colorkey([0, 0, 0])
-        self.HP = 50000
-        self.maxHP = 50000
+        self.HP = 15
+        self.maxHP = 20
         self.speed = 0.5
         self.normalSpeed = 0.5
         self.attack = 50

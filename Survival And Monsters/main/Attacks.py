@@ -1,7 +1,25 @@
 import pygame
+import animations
 from math import sqrt,acos,degrees
 from random import randint
 
+class Attack(animations.Animations_sprites):
+
+    def __init__(self):
+        super().__init__("anim_épée0")
+        self.image = pygame.image.load("Sprites/Move/anim_épée/anim_épée0.png") # génere l'image de départ
+        self.rect = self.image.get_rect()
+        self.pos =[]
+        self.origin_image = self.image.copy()
+        self.angle = 0
+    
+    def update(self):#actualisation de la position
+        self.rect.topleft = self.pos  #position
+
+    def get_image(self, x, y):
+        image = pygame.Surface([64, 64]) #surface occupée sur le jeu
+        image.blit(self.sprite_sheet, (0, 0), (x, y, 64, 64)) #Origine du crop et coordonnées de fin du crop
+        return image
 
 class fireBall(pygame.sprite.Sprite):
 

@@ -13,11 +13,12 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         
         self.pos = [x,y] #position du joueur
+        self.hitBox = [0,0]
         self.speed = 7 #vitesse du joueur
         self.old_pos = self.pos.copy()
         self.HP = 200
         self.maxHP = 200
-        self.degat = 2
+        self.degat = 5
         self.ratio = self.HP / self.maxHP
 
         #barre de vie
