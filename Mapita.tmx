@@ -1,19 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="94">
- <tileset firstgid="1" source="../Sets/Piso.cemen.tsx"/>
- <tileset firstgid="17" source="../Sets/PisoObscuro.tsx"/>
- <tileset firstgid="33" source="../Sets/Camino.tsx"/>
- <tileset firstgid="49" source="../Sets/Arbol1.tsx"/>
- <tileset firstgid="81" source="../Sets/Arbol2.tsx"/>
- <tileset firstgid="97" source="../Sets/Arbol4.tsx"/>
- <tileset firstgid="161" source="../Sets/Arbol4Quemado.tsx"/>
- <tileset firstgid="225" source="../Sets/Arbol3Quemado.tsx"/>
- <tileset firstgid="241" source="../Sets/Arbol2Quemado.tsx"/>
- <tileset firstgid="257" source="../Sets/arbol1Quemado.tsx"/>
- <tileset firstgid="273" source="../Sets/PalitosEnFuego.tsx"/>
- <tileset firstgid="289" source="../Sets/PastoFuego.tsx"/>
- <tileset firstgid="305" source="../Sets/Brotes.tsx"/>
- <tileset firstgid="369" source="../Sets/PalosYPiedras.tsx"/>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="64" tileheight="64" infinite="0" nextlayerid="8" nextobjectid="136">
+ <tileset firstgid="1" name="Piso.cemen" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/Piso.cemen.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="17" name="PisoObscuro" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/PisoObscuro.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="33" name="Camino" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/Camino.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="49" name="Arbol1" tilewidth="64" tileheight="64" tilecount="32" columns="4">
+  <image source="../Sets/Arbol1.png" width="256" height="512"/>
+ </tileset>
+ <tileset firstgid="81" name="Arbol2" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/Arbol2.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="97" name="Arbol4" tilewidth="64" tileheight="64" tilecount="64" columns="8">
+  <image source="../Sets/Arbol4.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="161" name="Arbol4Quemado" tilewidth="64" tileheight="64" tilecount="64" columns="8">
+  <image source="../Sets/Arbol4Quemado.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="225" name="Arbol3Quemado" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/Arbol3Quemado.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="241" name="Arbol2Quemado" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/Arbol2Quemado.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="257" name="arbol1Quemado" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/arbol1Quemado.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="273" name="PalitosEnFuego" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/PalitosEnFuego.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="289" name="PastoFuego" tilewidth="64" tileheight="64" tilecount="16" columns="4">
+  <image source="../Sets/PastoFuego.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="305" name="Brotes" tilewidth="64" tileheight="64" tilecount="64" columns="8">
+  <image source="../Sets/Brotes.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="369" name="PalosYPiedras" tilewidth="64" tileheight="64" tilecount="9" columns="3">
+  <image source="../Sets/PalosYPiedras.png" width="206" height="206"/>
+ </tileset>
  <layer id="1" name="Pasto Base" width="30" height="30">
   <data encoding="csv">
 22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,
@@ -80,6 +108,40 @@
 373,363,363,364,0,340,338,0,0,0,0,353,292,292,37,39,363,364,356,354,0,292,289,0,0,0,339,0,337,0,
 0,0,0,0,0,0,0,346,0,292,0,0,0,0,37,39,337,0,0,0,0,0,284,0,0,0,0,0,0,275,
 369,363,364,0,0,369,372,292,278,0,0,372,370,289,37,39,339,0,0,275,0,292,288,372,0,0,369,0,292,370
+</data>
+ </layer>
+ <layer id="3" name="Groundstuff" width="30" height="30">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,274,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,288,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,303,304,304
 </data>
  </layer>
  <layer id="4" name="Arboles" width="30" height="30">
@@ -165,5 +227,40 @@
   <object id="41" x="326.5" y="478.5" width="85" height="116"/>
   <object id="72" x="1836" y="794" width="30" height="76"/>
   <object id="77" x="1816" y="1648" width="40" height="72"/>
+  <object id="95" x="9.48851" y="0" width="410.378" height="116.234"/>
+  <object id="96" x="422.239" y="85.3966" width="37.954" height="85.3966"/>
+  <object id="98" x="464.937" y="109.118" width="2.37213"/>
+  <object id="99" x="467.309" y="4.74426" width="156.56" height="104.374"/>
+  <object id="101" x="626.242" y="7.11638" width="177.91" height="21.3491"/>
+  <object id="102" x="799.407" y="7.11638" width="78.2802" height="85.3966"/>
+  <object id="103" x="880.059" y="4.74426" width="142.328" height="9.48851"/>
+  <object id="104" x="1020.01" y="14.2328" width="37.954" height="35.5819"/>
+  <object id="105" x="1076.95" y="42.6983" width="2.37213"/>
+  <object id="106" x="1048.48" y="2.37213" width="78.2802" height="26.0934"/>
+  <object id="107" x="1124.39" y="26.0934" width="125.723" height="75.9081"/>
+  <object id="108" x="1250.11" y="7.11638" width="73.536" height="59.3032"/>
+  <object id="109" x="1321.28" y="61.6753" width="35.5819" height="109.118"/>
+  <object id="110" x="1359.23" y="47.4426" width="149.444" height="35.5819"/>
+  <object id="111" x="1506.3" y="42.6983" width="42.6983" height="61.6753"/>
+  <object id="112" x="1549" y="4.74426" width="201.631" height="54.5589"/>
+  <object id="113" x="1757.75" y="52.1868" width="156.56" height="52.1868"/>
+  <object id="114" x="1897.7" y="87.7687" width="18.977" height="528.984"/>
+  <object id="115" x="1895.33" y="614.381" width="14.2328" height="578.799"/>
+  <object id="116" x="1864.49" y="1209.79" width="49.8147" height="64.0474"/>
+  <object id="117" x="1836.03" y="1373.46" width="23.7213" height="73.536"/>
+  <object id="118" x="1900.07" y="1278.58" width="21.3491" height="635.73"/>
+  <object id="120" x="-2.37213" y="106.746" width="75.9081" height="123.351"/>
+  <object id="121" x="-7.11638" y="230.096" width="37.954" height="189.77"/>
+  <object id="122" x="9.48851" y="419.867" width="54.5589" height="97.2572"/>
+  <object id="123" x="0" y="514.752" width="35.5819" height="372.424"/>
+  <object id="124" x="21.3491" y="714.01" width="61.6753" height="97.2572"/>
+  <object id="126" x="2.37213" y="887.176" width="14.2328" height="614.381"/>
+  <object id="127" x="4.74426" y="1494.44" width="68.7917" height="94.8851"/>
+  <object id="129" x="-4.74426" y="1591.7" width="61.6753" height="329.726"/>
+  <object id="130" x="23.7213" y="1864.49" width="858.71" height="59.3032"/>
+  <object id="131" x="877.687" y="1897.7" width="621.497" height="18.977"/>
+  <object id="132" x="1501.56" y="1873.98" width="42.6983" height="45.0704"/>
+  <object id="133" x="1539.51" y="1890.59" width="379.54" height="28.4655"/>
+  <object id="134" x="1843.14" y="1833.65" width="64.0474" height="68.7917"/>
  </objectgroup>
 </map>
