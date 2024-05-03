@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         
         self.pos = [x,y] #position du joueur
-        self.hitBox = [0,0]
+        self.hitBox = [self.rect[2],self.rect[3]]#rectangle autour du joueur  
         self.speed = 7 #vitesse du joueur
         self.old_pos = self.pos.copy()
         self.HP = 200
@@ -41,14 +41,14 @@ class Player(pygame.sprite.Sprite):
         
         self.range = 250
         self.attackDelay = 0.25
-        self.fireDelay = 1
+        self.fireDelay = 2
         
-        self.zoneDelay = 0.5
+        self.zoneDelay = 2
         self.zoneRange = 150# cercle de 150 px de rayon
         self.zoneDegat = 50
         self.zoneSpeed  = 10#vitesse à laquelle la zone grossi  
         self.isZone = False# booléen ppour savoir si une attaque de zone est lancé
-        self.invincibl = 1 #periode pendant laquelle
+        self.invincibl = 2 #periode pendant laquelle
 
     def XPmanage(self):#gestion de l'expérience
         if self.XP >= self.maxXP and self.LVL<999 :
@@ -65,6 +65,15 @@ class Player(pygame.sprite.Sprite):
 
     def go_down(self): self.pos[1] += self.speed
 
+    def invincibility(self,visible):
+        if visible == True:
+            visible = False
+            self.image = pygame.image.load("Sprites/Character/invisible.png")
+        else :
+            self.image = pygame.image.load('Sprites/Character/Base.png')
+            visible = True
+        return visible
+    
     def end(self,startT,endT,vague):
         if self.HP <= 0:
             gameTime = endT - startT
@@ -78,7 +87,7 @@ class Player(pygame.sprite.Sprite):
             if self.killcount > maxscore:
                 print("\nBravo nouveau record de kill\n",self.killcount)
             scorefile = open("main/Score.csv","a")
-            scorefile.write(f"{self.killcount};{gameTime};{vague};lvl\n")
+            scorefile.write(f"{self.totalXP};{self.killcount};{gameTime};{vague};{self.LVL};\n")
             scorefile.close()
             scorefile.close()
 

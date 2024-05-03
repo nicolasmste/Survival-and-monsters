@@ -62,17 +62,16 @@ class ennemi(pygame.sprite.Sprite):
             else :
                 self.pos[1] += self.tan
 
-    def damage(self,Ppos,PHP):
-        r = 6
-        if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):
+    def damage(self,Prect,PHP):
+        
+        if pygame.Rect.colliderect(self.rect,Prect):
             PHP -= self.attack
-            #print("damage HP - ",self.attack)
+            
             return PHP,True
         return PHP,False
 
-    def hit(self,Ppos):
-        r = 13#doit dépendre de l'enemis
-        if (self.pos[0] <= Ppos[0]+r and self.pos[0] >= Ppos[0]-r) and (self.pos[1] <= Ppos[1]+r and self.pos[1] >= Ppos[1]-r):#si la position en X est compris entre PosPx + a et PosPx -a
+    def hit(self,Prect):
+        if pygame.Rect.colliderect(self.rect,Prect):
             return True
         return False
 

@@ -3,6 +3,20 @@ import animations
 from math import sqrt,acos,degrees
 from random import randint
 
+def direction(cib,pos):
+    adj = cib[0] - pos[0]
+    opp = cib[1] - pos[1]
+    hypo = sqrt(adj*adj + opp*opp)
+        
+    if(hypo == 0):#evite la division par 0
+        angle = 0
+    else:
+        angle = degrees(acos(adj/hypo))
+        
+    if opp > 0:
+        angle = -angle
+    return angle
+
 class Attack(animations.Animations_sprites):
 
     def __init__(self):
@@ -45,23 +59,6 @@ class fireBall(pygame.sprite.Sprite):
             self.coef = (self.cible[1]-self.pos[1])/(self.cible[0]-self.pos[0])#coefficient directeur de la droite
         
         self.tan = sqrt((self.speed*self.speed)/(1+self.coef*self.coef))#variable qui permet d'avoir toujour la bonne vitesse de déplacement en fonction de self.speed peut importe le coef
-
-
-    def direction(self):
-        #mieux d'utiliser le cos
-        adj = self.cible[0] - self.startPos[0]
-        opp = self.cible[1] - self.startPos[1]
-        hypo = sqrt(adj*adj + opp*opp)
-        
-        if(hypo == 0):#evite la division par 0
-            angle = 0
-        else:
-            angle = degrees(acos(adj/hypo))
-        
-        if opp > 0:
-            angle = -angle
-        self.image = pygame.transform.rotate(self.image,angle)
-
 
     def move(self):#tire à l'opposé qund l'ennemis est en bas à droite et en haut à gauche
         

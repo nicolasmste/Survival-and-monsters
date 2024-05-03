@@ -39,7 +39,6 @@ class Play:
         self.map_layer.zoom = 2
 
     def game_init(self):
-
         #générer le joueur
         self.player = Player(0,0)
         
@@ -53,13 +52,14 @@ class Play:
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
         self.coefVague = 1
         self.nVague = 0#numéro de la vague
+        
 
         self.animation = False
         self.num_anim = 0
         self.épée = Animations_sprites('anim_épée',self.player.pos[0],self.player.pos[1])
 
         self.music = sound()
-        self.listEtape = [1,3]#liste des vagues où la musique évolue
+        self.listEtape = [1,3,4,5,6,7]#liste des vagues où la musique évolue
         #faire qqchose quand onn arrive à la fin de la liste pour éviter index out of range
         self.nbMus = len(self.listEtape)
         self.etape = 0
@@ -70,10 +70,11 @@ class Play:
         self.oldAt = 0#moment auquel à eu lieu la derniere attaque au CAC
         self.hitTime = 0#moment du dernier coup recu
         self.oldZone = 0#moment de la derniere attacke de zone
-
+        
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=1 )
         self.group.add(self.player)
+        self.visible = True
         self.group.add(self.listEnnemis)
         self.group.add(self.listitems)
         self.group.add(self.hpbar)
@@ -88,6 +89,16 @@ class Play:
         if time() - old >= d:
             return True
         return False
+    
+    def orientation(self,angle):
+        if angle < -45 and angle <=45:
+            return ''
+        if angle > 45 and angle <= 135:
+            return "_haut"
+        if angle > 135 or angle <-135:
+            return "_g"
+        else :
+            return "_bas"
     
     def Experience(self,xpgive):
         self.player.XP += xpgive
@@ -135,10 +146,13 @@ class Play:
                 print("Zone attack")
 
     def Startmenu(self):
+   
         self.screen.blit(self.menu.pressplay, (0, 0))
         self.screen.blit(self.menu.playbutton,self.menu.press)
         self.screen.blit(self.menu.settingsimage,self.menu.setrect)
         self.game_init()
+        if not pygame.mixer.music.get_busy():
+            self.music.playMus(self.music.musicMenu)
 
     def Gameovermenu(self):
         self.screen.blit(self.menu.gameoverscreen,self.menu.gorect) 
@@ -167,9 +181,9 @@ class Play:
         self.timeStart = time()
         
         while running:
-
-            if self.menu.PLAY and not self.menu.PAUSE:# 
             
+            if self.menu.PLAY and not self.menu.PAUSE:# 
+                
                 if self.listEnnemis == []:#4eme vague avec 180 elements = un peu beaucoup
                     aRemplir = True
                     self.nVague += 1
@@ -177,7 +191,7 @@ class Play:
                     self.group.add(self.listitems[-1])
 
                     if self.etape < self.nbMus and self.nVague >=self.listEtape[self.etape]:
-                        self.music.play(self.music.listMus[self.etape])
+                        self.music.playMus(self.music.listMus[self.etape])
                         self.etape += 1
 
                     self.tailleVague = self.tailleVague*self.coefVague
@@ -195,46 +209,54 @@ class Play:
                     #faire en sorte que qu'il y ai des nombres à virgule
                 
                 for en in self.listEnnemis :
+                    delete = False
                     en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
-                    if self.delay(self.hitTime,self.player.invincibl):#temps d'invincibilité
-                        dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
-                        if(dam[1] == True):
-                            self.player.HP = dam[0]
-                            self.hitTime = time()
 
-
-                    if self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
+                    if self.player.LVL >1 and self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
+                        self.music.fireBallSound.play()
                         self.oldFire = time()#actualisation de la derniere fois que l'on à tir
                         self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
-                        self.listFireball[-1].direction()
+                        self.listFireball[-1].image = pygame.transform.rotate(self.listFireball[-1].image,direction(self.listFireball[-1].cible,self.listFireball[-1].startPos))
                         self.group.add(self.listFireball[-1])
-                        self.music.explosion.play()         
+                              
 
                     if self.listFireball != []:                      
                         for fir in self.listFireball:
-                            if en.hit(fir.pos):# or (en.hit(self.player.pos) and self.delay(self.oldAt,self.player.attackDelay)):#cas où une boule de feu touche un ennemi
-                                #self.oldAt = time.time()
-                                self.kill(en,fir.degat)
-                                self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
+                            if en.hit(fir.rect):#ajouter la hitbox de la boule de feu
+                                self.music.explosionSound.play()
+                                delete = self.kill(en,fir.degat)
                                 self.group.remove(fir)
+                                self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
                                 
                                 break#pour ne pas retirer 2 fois un ennemis de la liste
-                    else: 
-                        if en.hit(self.player.pos) and self.delay(self.oldAt,self.player.attackDelay):#si le joueur attaque un ennemis au CAC
-                            self.oldAt = time()
-                            self.kill(en,self.player.degat)
-                            if self.animation  == False :
-                                self.animation = True
-                                self.épée.image = pygame.image.load(f"Sprites/Move/anim_épée/anim_épée0.png")
-                                self.num_anim = 0
-                                self.épée.rect.x = self.player.pos[0]
-                                self.épée.rect.y = self.player.pos[1]
+        
+                    if en.hit(self.player.rect) and self.delay(self.oldAt,self.player.attackDelay) and delete == False:#si le joueur attaque un ennemis au CAC
+                        self.music.epeeSound.play()
+                        self.oldAt = time()
+                        self.kill(en,self.player.degat)
+                        if self.animation  == False :
+                            self.animation = True
+                            self.cote = self.orientation(direction(en.pos,self.player.pos))
+                            self.épée.image = pygame.image.load(f"Sprites/Move/anim_epee{self.cote}/anim_epee{self.cote}0.png")
+                            self.num_anim = 0
+                            self.épée.rect.x = self.player.pos[0]
+                            self.épée.rect.y = self.player.pos[1]
+                            if self.cote == "_haut":
+                                self.épée.rect.y -= 32
+                            if self.cote == "_g":
+                                self.épée.rect.x -= 32
 
-                        elif self.player.isZone == True:#si le joueur fait une attaque de zone
-                            if(self.distance(self.player.pos,en.pos)<= self.player.zoneRange):                              
-                                self.kill(en,self.player.zoneDegat)
-                                #faire l'attaque de zone et apres la boucle mettre isZone à false
-                                
+                    elif self.player.isZone == True and delete == False:#si le joueur fait une attaque de zone
+                        if(self.distance(self.player.pos,en.pos)<= self.player.zoneRange):                              
+                            self.kill(en,self.player.zoneDegat)
+                            #faire l'attaque de zone et apres la boucle mettre isZone à false
+
+                    elif self.delay(self.hitTime,self.player.invincibl):#temps d'invincibilité
+                        dam = en.damage(self.player.rect,self.player.HP)#gestion des dégats au joueur
+                        if(dam[1] == True):#Si le joueur prend des dégats
+                            self.music.listDegatSound[randint(0,3)].play()
+                            self.player.HP = dam[0]
+                            self.hitTime = time()      
                 
                 if self.player.isZone == True:
                     self.player.isZone = False
@@ -250,7 +272,14 @@ class Play:
                 for items in self.listitems:
                     if pygame.sprite.collide_rect(items,self.player) :
                         self.group.remove(items)
+                  
+                if self.delay(self.hitTime,self.player.invincibl) == False:
+                    self.visible = self.player.invincibility(self.visible)
                 
+                elif self.visible == False:#permet d'eviter de laiser le joueur invisible si à la fin de l'animation il est invisible
+                    self.player.image = pygame.image.load('Sprites/Character/Base.png')
+                    self.visible = True
+
                 if self.animation == True :#si il doit y avoir l'annimation du coup d'épé
 
                     if self.num_anim >= self.épée.taille_anim :#si c'est la derniere image on désafiche l'animation
@@ -259,9 +288,10 @@ class Play:
                     else : 
                         if self.num_anim != 0 :
                             self.group.remove(self.épée)
+                        
                         self.group.add(self.épée)
                         self.num_anim += 1
-                        self.épée.image = pygame.image.load(f"Sprites/Move/anim_épée/anim_épée{self.num_anim}.png")
+                        self.épée.image = pygame.image.load(f"Sprites/Move/anim_epee{self.cote}/anim_epee{self.cote}{self.num_anim}.png")
 
                 self.keybordinput()
                 self.group.update() #update position du joueur
@@ -303,19 +333,25 @@ class Play:
   
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.press.collidepoint(event.pos) and not self.menu.PLAY and not self.menu.SETTINGS and not self.menu.gameover:
-                    self.menu.PLAY = True #SI ON APPUIE SUR PLAY LE JEU SE LANCE   
+                    self.menu.PLAY = True #SI ON APPUIE SUR PLAY LE JEU SE LANCE 
+                    pygame.mixer.music.stop()
+                
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.pauserect.collidepoint(event.pos) and self.menu.PLAY and not self.menu.gameover :
                     pygame.mouse.set_visible(True)
                     self.menu.PAUSE = True #SI ON APPUIE SUR PAUSE LE JEU SE LANCE
+                
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.resumerect.collidepoint(event.pos) and self.menu.PAUSE:
                     self.menu.PAUSE = False#tu clique trop vite il te faut juste un menue
                     pygame.mixer.music.unpause()
                     pygame.mouse.set_visible(False)
+                
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.gorect.collidepoint(event.pos) and self.menu.gameover:
                     self.menu.gameover = False 
                     pygame.mouse.set_visible(False)
+                
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.setrect.collidepoint(event.pos) and not self.menu.PLAY and not self.menu.SETTINGS:
                     self.menu.SETTINGS = True
+                
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.quitbutton.collidepoint(event.pos) and self.menu.SETTINGS:
                     self.menu.SETTINGS = False
 
