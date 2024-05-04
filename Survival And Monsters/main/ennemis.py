@@ -3,10 +3,9 @@ import pygame
 from math import sqrt
 from Attributes import *
 from random import randint
-#import Attacks
 
-types = [slime(),kingslime(),Orc(),Bat()]
-def newtype():
+types = [slime(),kingslime(),Orc(),Bat()]#différents ennemis
+def newtype():#fonction qui permet de choisit le type du nouvel ennemi
     return types[randint(0,3)]
 
 class ennemi(pygame.sprite.Sprite):
@@ -17,8 +16,9 @@ class ennemi(pygame.sprite.Sprite):
         self.image = self.get_image(0, 0)
         self.image.set_colorkey([0, 0, 0])
 
-        self.type = newtype()
+        self.type = newtype()#type de l'ennemi
 
+        #tous les parametres(points de vie, vitesse, dégats et image) dépend du tyoe de l'ennemi
         self.image = self.type.image
         self.givenxp = 2
 
@@ -35,26 +35,24 @@ class ennemi(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 
-    def moveTo(self,Px,Py):
+    def moveTo(self,Px,Py):#fonction qui déplace les ennemis vers le joueur
         
         if self.pos[0] == Px :#si les coordonnées en X sont égales, évite la division par 0
             coef = 0
         else :
             coef = (Py-self.pos[1])/(Px-self.pos[0])#coefficient directeur de la droite
 
-        self.tan = sqrt((self.speed*self.speed)/(1+coef*coef))
+        self.tan = sqrt((self.speed*self.speed)/(1+coef*coef))#distance a parcourir en abscisse pour que l'ennemis parcours une distance égale à la variable speed
 
-        if Px != self.pos[0]:
-            #self.pos[1] += self.speed * self.coef
-            if self.pos[0] < Px:
+        if Px != self.pos[0]:#Si le joueur et l'ennemi n'ont pas la même abscisse
+      
+            if self.pos[0] < Px:#Si l'ennemi est à gauche du joueur
                 self.pos[1] += self.tan * coef
-            else:
-                self.pos[1] -= self.tan * coef
-            
-            if self.pos[0]>Px:
-                self.pos[0] -= self.tan
-            else :
                 self.pos[0] += self.tan
+            else:#Si l'ennemi est à droite du joueur
+                self.pos[1] -= self.tan * coef
+                self.pos[0] -= self.tan
+            
         
         else:#il faut juste déplacer en Y
             if self.pos[1]>Py:
@@ -62,7 +60,7 @@ class ennemi(pygame.sprite.Sprite):
             else :
                 self.pos[1] += self.tan
 
-    def damage(self,Prect,PHP):
+    def damage(self,Prect,PHP):#Si le joueur est touché
         
         if pygame.Rect.colliderect(self.rect,Prect):
             PHP -= self.attack
@@ -70,7 +68,7 @@ class ennemi(pygame.sprite.Sprite):
             return PHP,True
         return PHP,False
 
-    def hit(self,Prect):
+    def hit(self,Prect):#si un ennemis est touché
         if pygame.Rect.colliderect(self.rect,Prect):
             return True
         return False

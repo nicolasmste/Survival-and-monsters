@@ -47,34 +47,35 @@ class Play:
         self.hpbar = HPbar(self.player.pos[0],self.player.pos[1],self.player.ratio,self.player.speed)
         self.xpbar = XPbar(self.player.pos[0],self.player.pos[1],self.player.xpratio)
 
+        #listes qui contiennent les différents objets
         self.listEnnemis = []
         self.listitems = []
+        self.listFireball = []
+
+
         self.tailleVague = 10 #taille de la premiere vague d'ennemis
         self.coefVague = 1
         self.nVague = 0#numéro de la vague
         
 
-        self.animation = False
+        self.animation = False#variable qui dit si une annimation est en cours
         self.num_anim = 0
         self.épée = Animations_sprites('anim_épée',self.player.pos[0],self.player.pos[1])
 
         self.music = sound()
         self.listEtape = [1,3,4,5,6,7]#liste des vagues où la musique évolue
-        #faire qqchose quand onn arrive à la fin de la liste pour éviter index out of range
         self.nbMus = len(self.listEtape)
         self.etape = 0
 
-        self.listFireball = []
-
         self.oldFire = 0#moment auquel la derniere fireBall à été tiré
-        self.oldAt = 0#moment auquel à eu lieu la derniere attaque au CAC
-        self.hitTime = 0#moment du dernier coup recu
+        self.oldAt = 0#moment auquel à eu lieu la derniere attaque au corp à corp
         self.oldZone = 0#moment de la derniere attacke de zone
+        self.hitTime = 0#moment du dernier coup recu
+        self.visible = True
         
         #dessin du groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=1 )
         self.group.add(self.player)
-        self.visible = True
         self.group.add(self.listEnnemis)
         self.group.add(self.listitems)
         self.group.add(self.hpbar)
@@ -90,7 +91,7 @@ class Play:
             return True
         return False
     
-    def orientation(self,angle):
+    def orientation(self,angle):#permet d'orienter une image avec le bon angle (ici les boules de feux et  l'attaque)
         if angle < -45 and angle <=45:
             return ''
         if angle > 45 and angle <= 135:
@@ -100,7 +101,7 @@ class Play:
         else :
             return "_bas"
     
-    def Experience(self,xpgive):
+    def Experience(self,xpgive):#gère l'expérience
         self.player.XP += xpgive
         self.player.XPmanage()
         print(f"XP : {self.player.XP}")
@@ -118,7 +119,7 @@ class Play:
         return False
 
     
-    def keybordinput(self) :
+    def keybordinput(self) :#gère les actions du clavier
             touche = pygame.key.get_pressed() #Clavier
             
             if touche[pygame.K_UP]:
@@ -145,28 +146,28 @@ class Play:
                 #affiche l'image de l'attaque de zone
                 print("Zone attack")
 
-    def Startmenu(self):
+    def Startmenu(self):#menu d'acceuil
    
         self.screen.blit(self.menu.pressplay, (0, 0))
         self.screen.blit(self.menu.playbutton,self.menu.press)
         self.screen.blit(self.menu.settingsimage,self.menu.setrect)
         self.game_init()
-        if not pygame.mixer.music.get_busy():
+        if not pygame.mixer.music.get_busy():#si il n'y a pas de musique on lance celle du menu
             self.music.playMus(self.music.musicMenu)
 
-    def Gameovermenu(self):
+    def Gameovermenu(self):#menu de game over
         self.screen.blit(self.menu.gameoverscreen,self.menu.gorect) 
         self.listEnnemis = []
         for i in self.group:
             if i != self.player: self.group.remove(i)
 
-    def Pausemenu(self):
+    def Pausemenu(self):#menu pause
             self.screen.blit(self.menu.pausemenu,(0,0))
             self.screen.blit(self.menu.resumebutton,self.menu.resumerect)
             self.screen.blit(self.menu.volumeplus,self.menu.plusbutton)
             self.screen.blit(self.menu.volumeminus,self.menu.minusbutton)
     
-    def Settingsmenu(self):
+    def Settingsmenu(self):#menu des parametres (volume sonore et crédits)
         self.screen.blit(self.menu.pausemenu,(0,0))
         self.screen.blit(self.menu.quit,self.menu.quitbutton)
         self.screen.blit(self.menu.quit,self.menu.resumerect)
@@ -178,96 +179,92 @@ class Play:
         clock = pygame.time.Clock() #Objet de type horloge
         #Boucle de run, (exit permet de sortir de la boucle quand on ferme la fenêtre)
         running = True
-        self.timeStart = time()
+        self.timeStart = time()#temps auquel la partie à débuté
         
         while running:
             
-            if self.menu.PLAY and not self.menu.PAUSE:# 
+            if self.menu.PLAY and not self.menu.PAUSE:#si on est dans la partie
                 
-                if self.listEnnemis == []:#4eme vague avec 180 elements = un peu beaucoup
-                    aRemplir = True
+                if self.listEnnemis == []:#Si il n'y a pas d'ennemis on les ajoute en fonction de la taille de la vague
+                    aRemplir = True#on doit ajouter des ennemis
                     self.nVague += 1
-                    self.listitems.append(effect(randint(0,1000),randint(0,600)))
-                    self.group.add(self.listitems[-1])
+                    self.listitems.append(effect(randint(0,1000),randint(0,600)))#On ajoute des ennemis
+                    self.group.add(self.listitems[-1])#et on les fait apparaitre
 
                     if self.etape < self.nbMus and self.nVague >=self.listEtape[self.etape]:
+                        #La musique evolue au fil des vagues
                         self.music.playMus(self.music.listMus[self.etape])
                         self.etape += 1
 
                     self.tailleVague = self.tailleVague*self.coefVague
-                    print("vague n°", self.nVague)
-                    print("ennemis = ",self.tailleVague)
+
                     #faire apparaitre les ennemis hors de la map
 
-                if aRemplir == True:   
+                if aRemplir == True:
                     self.listEnnemis.append(ennemi(randint(0,1000),randint(0,600)))#création d'un nouvel ennemi à des positions random 
                     self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
 
-                if len(self.listEnnemis) == self.tailleVague:
+                if len(self.listEnnemis) == self.tailleVague:#Si on  a ajouter le bon nombre d'ennemis
                     aRemplir = False
                     self.coefVague = randint(self.nVague,2*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
-                    #faire en sorte que qu'il y ai des nombres à virgule
                 
-                for en in self.listEnnemis :
-                    delete = False
+                for en in self.listEnnemis :#pour chaque ennemis
+                    delete = False#Booléen pour savoir si l'ennemis a été supprimé
                     en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
 
                     if self.player.LVL >1 and self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
                         self.music.fireBallSound.play()
                         self.oldFire = time()#actualisation de la derniere fois que l'on à tir
-                        self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))
-                        self.listFireball[-1].image = pygame.transform.rotate(self.listFireball[-1].image,direction(self.listFireball[-1].cible,self.listFireball[-1].startPos))
-                        self.group.add(self.listFireball[-1])
+                        self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))#on ajoute une boule de feu 
+                        self.listFireball[-1].image = pygame.transform.rotate(self.listFireball[-1].image,direction(self.listFireball[-1].cible,self.listFireball[-1].startPos))#on l'oriente dans la bonne direction
+                        self.group.add(self.listFireball[-1])#et on l'affiche
                               
 
                     if self.listFireball != []:                      
-                        for fir in self.listFireball:
-                            if en.hit(fir.rect):#ajouter la hitbox de la boule de feu
-                                self.music.explosionSound.play()
-                                delete = self.kill(en,fir.degat)
-                                self.group.remove(fir)
-                                self.listFireball.remove(fir)#pareil pour la boule de feu qui à touché l'ennemis
-                                
-                                break#pour ne pas retirer 2 fois un ennemis de la liste
+                        for fir in self.listFireball:#pour chaque boulle de feu
+                            if en.hit(fir.rect):#Si elle touche un ennemis
+                                self.music.explosionSound.play()#Jouer le bruit de l'xplosion
+                                delete = self.kill(en,fir.degat)#Si l'ennemis n'as plus de vie on le suprime
+                                self.group.remove(fir)#On désafiche la boule de feu 
+                                self.listFireball.remove(fir)#et on la supprime
         
-                    if en.hit(self.player.rect) and self.delay(self.oldAt,self.player.attackDelay) and delete == False:#si le joueur attaque un ennemis au CAC
+                    if en.hit(self.player.rect) and self.delay(self.oldAt,self.player.attackDelay) and delete == False:#si le joueur touche l'ennemis, peut l'attaquer et qu'il n'a pas encore été supprimé
                         self.music.epeeSound.play()
                         self.oldAt = time()
                         self.kill(en,self.player.degat)
-                        if self.animation  == False :
+                        if self.animation == False:#si l'annimation du coup d'épée n'est pas cours
                             self.animation = True
-                            self.cote = self.orientation(direction(en.pos,self.player.pos))
-                            self.épée.image = pygame.image.load(f"Sprites/Move/anim_epee{self.cote}/anim_epee{self.cote}0.png")
+                            self.cote = self.orientation(direction(en.pos,self.player.pos))#savoir de quelle coté vient l'ennemis et d'orienter le coup dans la bonne direction
+                            self.épée.image = pygame.image.load(f"Sprites/Move/anim_epee{self.cote}/anim_epee{self.cote}0.png")#
                             self.num_anim = 0
-                            self.épée.rect.x = self.player.pos[0]
+                            self.épée.rect.x = self.player.pos[0]#place l'annimation sur le joueur
                             self.épée.rect.y = self.player.pos[1]
                             if self.cote == "_haut":
                                 self.épée.rect.y -= 32
                             if self.cote == "_g":
                                 self.épée.rect.x -= 32
 
-                    elif self.player.isZone == True and delete == False:#si le joueur fait une attaque de zone
-                        if(self.distance(self.player.pos,en.pos)<= self.player.zoneRange):                              
+                    if self.player.isZone == True and delete == False:#si le joueur fait une attaque de zone
+                        if(self.distance(self.player.pos,en.pos)<= self.player.zoneRange):#si l'ennemi est dans le rayon de l'attaque                        
                             self.kill(en,self.player.zoneDegat)
-                            #faire l'attaque de zone et apres la boucle mettre isZone à false
 
-                    elif self.delay(self.hitTime,self.player.invincibl):#temps d'invincibilité
+                    if self.delay(self.hitTime,self.player.invincibl):#Si le joueur n'est pas en état d'invicibilité
                         dam = en.damage(self.player.rect,self.player.HP)#gestion des dégats au joueur
                         if(dam[1] == True):#Si le joueur prend des dégats
                             self.music.listDegatSound[randint(0,3)].play()
-                            self.player.HP = dam[0]
-                            self.hitTime = time()      
+                            self.player.HP = dam[0]#On met à jour les points de vie du joueur en fonction des dégats infligé par l'ennemi
+                            self.hitTime = time()#On actualise le temps de du dernier coup reçu    
                 
-                if self.player.isZone == True:
+                if self.player.isZone == True:#si il y avait une attaque de zone on l'enleve
                     self.player.isZone = False
                     self.group.remove(self.zoneS)#on désafiche l'image de la zone
                     self.oldZone = time()#si on le met avant seul le premier ennemis sera touché car oldZone s'actualise donc le delai va etre trop petit
                 
-                for fir in self.listFireball:
-                    fir.move()
-                    if self.distance(fir.startPos,fir.pos) > self.player.range:
-                        self.listFireball.remove(fir)
-                        self.group.remove(fir)
+                for fir in self.listFireball:#Pour chaque boule de feu
+                    fir.move()#on la déplace
+                    if self.distance(fir.startPos,fir.pos) > self.player.range:#Si on elle est dépace la portée
+                        self.group.remove(fir)#On la désafiche
+                        self.listFireball.remove(fir)#On la supprime
                 
                 for items in self.listitems:
                     if pygame.sprite.collide_rect(items,self.player) :
@@ -305,8 +302,8 @@ class Play:
                 self.screen.blit(self.xpbar.image,self.xpbar.rect)
                 self.screen.blit(self.menu.pausebutton,self.menu.pauserect)
                 
-                if self.player.end(self.timeStart,time(),self.nVague):#On verifie si le joueur à toujour des pv
-                    pygame.mixer.music.stop()
+                if self.player.end(self.timeStart,time(),self.nVague):#Si le joueur n'a plus de points de vie
+                    pygame.mixer.music.stop()#On arrete la musique
                     pygame.mouse.set_visible(True)
                     self.menu.gameover = True
                     self.menu.PLAY = False

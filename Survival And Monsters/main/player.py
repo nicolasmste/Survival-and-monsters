@@ -2,7 +2,6 @@ from typing import Any
 import pygame
 from Attacks import *
 from math import ceil
-from time import time
 
 class Player(pygame.sprite.Sprite):
 
@@ -40,7 +39,7 @@ class Player(pygame.sprite.Sprite):
         self.killcount = 0
         
         self.range = 250
-        self.attackDelay = 0.25
+        self.attackDelay = 0.5
         self.fireDelay = 2
         
         self.zoneDelay = 2
@@ -65,7 +64,7 @@ class Player(pygame.sprite.Sprite):
 
     def go_down(self): self.pos[1] += self.speed
 
-    def invincibility(self,visible):
+    def invincibility(self,visible):#fonction qui permet de faire clignoter le joueur pendant qu'il est invincible apres avoir recu un coup
         if visible == True:
             visible = False
             self.image = pygame.image.load("Sprites/Character/invisible.png")
@@ -74,33 +73,29 @@ class Player(pygame.sprite.Sprite):
             visible = True
         return visible
     
-    def end(self,startT,endT,vague):
+    def end(self,startT,endT,vague):#Si le joueur perd de la vie, on vérifie si il a encore de la vie
         if self.HP <= 0:
-            gameTime = endT - startT
-            scorefile = open("main/Score.csv","r")
+            gameTime = endT - startT#On calcule le temps qu'a duré une partie
+            scorefile = open("main/Score.csv","r")#On lis le fichier des scores pour trouver le meilleur
             maxscore = -1
             
             for i in scorefile:
                 s = int(i.split(";")[0])
                 if s >= maxscore:
                     maxscore = s
-            if self.killcount > maxscore:
+            
+            if self.totalXP > maxscore:#Si on a battu le meilleur score score 
                 print("\nBravo nouveau record de kill\n",self.killcount)
-            scorefile = open("main/Score.csv","a")
-            scorefile.write(f"{self.totalXP};{self.killcount};{gameTime};{vague};{self.LVL};\n")
             scorefile.close()
+
+            scorefile = open("main/Score.csv","a")#Ensuite, on écrit les statistiques de la partie
+            scorefile.write(f"{self.totalXP};{self.killcount};{gameTime};{vague};{self.LVL};\n")
             scorefile.close()
 
             print("game over")
             print("nombre de kill : ", self.killcount)
             return True
         return False
-            #faire un fichier qui enregistre les scores à ouvrir en 'r+' :
-            #   le temps -> créer une variable temps début et temps fin
-            #   le nb de kill
-            #   le nb de vague
-            #   le niveau
-            
 
     def update(self):#actualisation de la position
         if self.HP < 0: 
