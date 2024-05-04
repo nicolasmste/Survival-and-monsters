@@ -1,10 +1,8 @@
 import pygame
 
-
 class Menu:
-    def __init__(self,screen):
+    def __init__(self,screen): #Jutse pour récupérer et placer les images
         self.PLAY = False
-
 
        #ECRAN DE DEBUT 
         self.pressplay = pygame.image.load('Menus/FOND.png')
@@ -14,8 +12,8 @@ class Menu:
         self.settingsimage = pygame.image.load('Menus/SETTINGS.png')
         self.setrect = self.settingsimage.get_rect()
         self.press = self.playbutton.get_rect()
-        self.press.x = screen.get_width()/3
-        self.press.y = screen.get_height()/3
+        self.press.x = (screen.get_width()/3)
+        self.press.y = (screen.get_height()/3)
         self.setrect.x = self.press.x
         self.setrect.y = (self.press.y)+200
 
@@ -43,8 +41,6 @@ class Menu:
         self.pauserect = self.pausebutton.get_rect()
         self.pauserect.x = 1230
         self.pauserect.y = 20
-
-
 
        #Ecran de GAME OVER 
         self.gameover = False

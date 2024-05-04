@@ -2,6 +2,7 @@ from typing import Any
 import pygame
 from Attacks import *
 from math import ceil
+from random import choices
 
 class Player(pygame.sprite.Sprite):
 
@@ -9,24 +10,31 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.sprite_sheet = pygame.image.load('Sprites/Character/Base.png')
         self.image = self.get_image(self.sprite_sheet, 0, 0, 32, 32) #coordonées de début du get
-        self.image.set_colorkey([0, 0, 0]) #on sup le noir
+        self.image.set_colorkey([0, 0, 0]) #on supprime le noir
         self.rect = self.image.get_rect()
         
         self.pos = [x,y] #position du joueur
-        self.hitBox = [self.rect[2],self.rect[3]]#rectangle autour du joueur  
-        self.speed = 7 #vitesse du joueur
         self.old_pos = self.pos.copy()
+        self.hitBox = [self.rect[2],self.rect[3]]#rectangle autour du joueur  
+        self.feet = pygame.Rect(0,0,self.rect.width*0.5,16) #pieds pour bordure
+        
+        #Statistiques de vitesse, de points de vie
+        self.speed = 7 #vitesse du joueur
         self.HP = 200
         self.maxHP = 200
-        self.degat = 20
-        self.ratio = self.HP / self.maxHP
+        
+        #Protection(item)
+        self.shield = False
+        self.shieldcooldownmax =  100
+        self.shieldcooldown = self.shieldcooldownmax
 
         #barre de vie
-        self.sprite_HP = pygame.image.load('Sprites/Bars/hpBarGIF.png')
-        self.HPIMAGES = [self.get_image(self.sprite_HP, 0+j*64 , 0 , 64, 64) for j in range (0,13)]
+        self.ratio = self.HP / self.maxHP#permet de faire fonctionner la barre de vie
+        # self.sprite_HP = pygame.image.load('Sprites/Bars/hpBarGIF.png')
+        # self.HPIMAGES = [self.get_image(self.sprite_HP, 0+j*64 , 0 , 64, 64) for j in range (0,13)]
         
-        self.HPIMAGE = self.HPIMAGES[0]
-        self.rectHP = self.HPIMAGE.get_rect()
+        #self.HPIMAGE = self.HPIMAGES[0]
+        #self.rectHP = self.HPIMAGE.get_rect()
 
         #expérience
         self.XP = 0
@@ -35,13 +43,14 @@ class Player(pygame.sprite.Sprite):
         self.LVL = 0
         self.totalXP = 0
         self.xpratio = self.XP / self.maxXP 
-
         self.killcount = 0
+        self.maxscore = 0
         
+        #statistiques d'attaque
+        self.degat = 20
         self.range = 250
         self.attackDelay = 0.5
         self.fireDelay = 2
-        
         self.zoneDelay = 2
         self.zoneRange = 150# cercle de 150 px de rayon
         self.zoneDegat = 50
@@ -49,12 +58,47 @@ class Player(pygame.sprite.Sprite):
         self.isZone = False# booléen ppour savoir si une attaque de zone est lancé
         self.invincibl = 2 #periode pendant laquelle
 
+        #Probas pour niveaux
+        self.types = [self.maxHP,self.speed,self.shieldcooldownmax,self.range,self.attackDelay,self.fireDelay]
+        self.probas = [10/6,10/6,10/6,10/6,10/6,10/6]
+
+    def newtype(self):#buff random
+        chosen_object = choices(self.types, weights=self.probas)[0]
+        return chosen_object
+
     def XPmanage(self):#gestion de l'expérience
         if self.XP >= self.maxXP and self.LVL<999 :
             self.XP = self.XP - self.maxXP
             self.totalXP += self.maxXP
             self.maxXP = ceil(self.maxXP * self.coeffXP)
             self.LVL += 1 
+            #Buff random
+            buff = self.newtype()
+            print(f"NEW BUFF:{buff}")
+            if buff == self.maxHP:
+                self.maxHP += 20 
+                print("HP")
+                buffed = self.maxHP
+            if buff == self.speed:
+                self.speed += 1
+                print("SPEED")
+                buffed =self.speed  
+            if buff == self.shieldcooldownmax:
+                self.shieldcooldownmax += 10
+                print("Shield")
+                buffed = self.shieldcooldownmax
+            if buff == self.range:
+                self.range += 3
+                print("range")
+                buffed = self.range
+            if buff == self.attackDelay:
+                self.attackDelay -= 0.0025
+                print("attaqueDelay")
+                buffed = self.attackDelay
+            if buff == self.fireDelay:
+                print("firedelay")
+                self.fireDelay -= 0.0025
+                buffed = self.fireDelay
 
     def go_left(self): self.pos[0] -= self.speed
 
@@ -63,6 +107,8 @@ class Player(pygame.sprite.Sprite):
     def go_up(self): self.pos[1] -= self.speed
 
     def go_down(self): self.pos[1] += self.speed
+
+    def saveloc(self): self.old_pos = self.pos.copy()
 
     def invincibility(self,visible):#fonction qui permet de faire clignoter le joueur pendant qu'il est invincible apres avoir recu un coup
         if visible == True:
@@ -83,7 +129,7 @@ class Player(pygame.sprite.Sprite):
                 s = int(i.split(";")[0])
                 if s >= maxscore:
                     maxscore = s
-            
+            self.maxscore = maxscore
             if self.totalXP > maxscore:#Si on a battu le meilleur score score 
                 print("\nBravo nouveau record de kill\n",self.killcount)
             scorefile.close()
@@ -103,9 +149,21 @@ class Player(pygame.sprite.Sprite):
         self.xpratio = self.XP / self.maxXP
         self.ratio = self.HP / self.maxHP
         self.rect.topleft = self.pos  #position
+        self.feet.midbottom = self.rect.midbottom
+        if self.shield: #gestion du bouclier
+            if self.shieldcooldown>0:
+                self.shieldcooldown -= 1
+            else:
+                self.shieldcooldown = self.shieldcooldownmax
+                self.shield = False
+
+    def rollback(self):#rollback pour bordures
+        self.pos = self.old_pos.copy()
+        self.rect.topleft = self.old_pos  #position
+        self.feet.midbottom = self.rect.midbottom
+
 
     def get_image(self, myimage, x, y, x1, y1):
         image = pygame.Surface([x1, y1]) #surface occupée sur le jeu
         image.blit(myimage, (0, 0), (x, y, x1, y1)) #Origine du crop et coordonnées de fin du crop
         return image
-        

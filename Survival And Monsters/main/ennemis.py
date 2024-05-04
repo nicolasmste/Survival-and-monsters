@@ -2,26 +2,30 @@ from typing import Any
 import pygame
 from math import sqrt
 from Attributes import *
-from random import randint
+from random import choices
 
 types = [slime(),kingslime(),Orc(),Bat()]#différents ennemis
+probas = [0.3,0.2,0.2,0.3]#proba de l'apparition des différents ennemis
+
+def color(me): #On modifie la couleur
+    for i in range(0,len(me)):
+        me[i].set_colorkey([0, 0, 0])
+
 def newtype():#fonction qui permet de choisit le type du nouvel ennemi
-    return types[randint(0,3)]
+    chosen_object = choices(types, weights=probas)[0]
+    return chosen_object
 
 class ennemi(pygame.sprite.Sprite):
     def __init__(self,x,y):
         super().__init__()
-
-        self.sprite_sheet = pygame.image.load('Sprites/Tengu/Tengu.png')
-        self.image = self.get_image(0, 0)
-        self.image.set_colorkey([0, 0, 0])
-
+        
         self.type = newtype()#type de l'ennemi
+        color(self.type.imageliste)
+        self.image = self.type.image#image
+        self.givenxp = self.type.xp #XP donnée
 
         #tous les parametres(points de vie, vitesse, dégats et image) dépend du tyoe de l'ennemi
-        self.image = self.type.image
-        self.givenxp = 2
-
+        
         self.HP = self.type.HP
         self.maxHP = self.type.maxHP
         
@@ -34,6 +38,17 @@ class ennemi(pygame.sprite.Sprite):
         self.pos = [x,y]
         self.rect = self.image.get_rect()
 
+    def move(self): #Change Sprite
+        if self.type.delay == 0:
+            if self.type.it == len(self.type.imageliste)-1:
+                self.type.image = self.type.imageliste[0]
+                self.type.it = 0
+            else : 
+                self.type.it += 1
+                self.type.image = self.type.imageliste[self.type.it]
+                self.image.set_colorkey([0, 0, 0])
+            self.type.delay = 10
+        else: self.type.delay -= 1
 
     def moveTo(self,Px,Py):#fonction qui déplace les ennemis vers le joueur
         
@@ -74,6 +89,8 @@ class ennemi(pygame.sprite.Sprite):
         return False
 
     def update(self):
+        self.move()
+        self.image = self.type.image
         self.rect.topleft = self.pos 
 
     def get_image(self, x, y):

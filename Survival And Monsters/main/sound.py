@@ -22,6 +22,10 @@ class sound :
             name = "music/SFX/degat"+str(j)+".wav"
             self.listDegatSound.append(pygame.mixer.Sound(name))
     
-    def playMus(self,mus):#fonction pour jouer les musiques
+    def update(self,vol): #change le volume de la musique
+        pygame.mixer.music.set_volume(float(vol)/10)
+    
+    def playMus(self,mus,vol):#fonction pour jouer les musiques
         self.music = pygame.mixer_music.load(mus)
+        pygame.mixer.music.set_volume(float(vol)/10)
         self.playM = pygame.mixer.music.play(loops = -1)#-1 permet de jouer en boucle
