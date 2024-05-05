@@ -20,13 +20,13 @@ class Player(pygame.sprite.Sprite):
         self.feet = pygame.Rect(0,0,self.rect.width*0.5,16) #pieds pour bordure
         
         #Statistiques de vitesse, de points de vie
-        self.speed = 7 #vitesse du joueur
-        self.HP = 10
-        self.maxHP = 200
+        self.speed = 5 #vitesse du joueur
+        self.HP = 150#point de vie du joueur
+        self.maxHP = 150
         
         #Protection(item)
         self.shield = False
-        self.shieldcooldownmax =  100
+        self.shieldcooldownmax =  100#temps d'activité du bouclir
         self.shieldcooldown = self.shieldcooldownmax
         self.LVLED = False #Verif si on gagne un niveau pour afficher
         #barre de vie
@@ -38,12 +38,12 @@ class Player(pygame.sprite.Sprite):
         self.maxXP = 10 
         self.LVL = 0
         self.totalXP = 0
-        self.xpratio = self.XP / self.maxXP 
+        self.xpratio = self.XP / self.maxXP#POur savoir quelle image de la barre d'expérience afficher 
         self.killcount = 0
         self.maxscore = 0
         
         #statistiques d'attaque
-        self.degat = 20
+        self.degat = 4
         self.range = 250
         self.attackDelay = 0.5
         self.fireDelay = 2
@@ -52,14 +52,17 @@ class Player(pygame.sprite.Sprite):
         self.zoneDegat = 50
         self.zoneSpeed  = 10#vitesse à laquelle la zone grossi  
         self.isZone = False# booléen ppour savoir si une attaque de zone est lancé
-        self.invincibl = 2 #periode pendant laquelle
-
+        self.invincibl = 1 #periode pendant laquelle
+        self.p1 =""
+        self.p = ""
         #Probas pour niveaux
-        self.types = [self.maxHP,self.speed,self.shieldcooldownmax,self.range,self.attackDelay,self.fireDelay]
-        self.probas = [10/6,10/6,10/6,10/6,10/6,10/6]
+        
+        
 
     def newtype(self):#buff random
-        chosen_object = choices(self.types, weights=self.probas)[0]
+        types = [self.maxHP,self.speed,self.shieldcooldownmax,self.range,self.attackDelay,self.fireDelay]
+        probas = [0.2,0.2,0.2,0.2,0.1,0.1]
+        chosen_object = choices(types, weights=probas)[0]
         return chosen_object
 
     def XPmanage(self):#gestion de l'expérience
@@ -68,43 +71,42 @@ class Player(pygame.sprite.Sprite):
             self.totalXP += self.maxXP
             self.maxXP = ceil(self.maxXP * self.coeffXP)
             self.LVL += 1 
-            p = "LVL " + str(self.LVL) + "  "#phrase à afficher à l'écran
             #Buff random
             self.LVLED = True
             buff = self.newtype()
-            print(f"NEW BUFF:{buff}")
+            self.p1 = "Stats IMPROVED"
             if buff == self.maxHP:
                 self.maxHP += 20 
                 
-                p = "LIFE IMPROVED"
+                self.p1 = "LIFE IMPROVED"
                 buffed = self.maxHP
             if buff == self.speed:
-                self.speed += 1
+                self.speed += 0.2
                 
-                p = "SPEED IMPROVED"
+                self.p1 = "SPEED IMPROVED"
                 buffed =self.speed  
             if buff == self.shieldcooldownmax:
                 self.shieldcooldownmax += 10
                 
-                p = "SHIELD + 10s"
+                self.p1 = "SHIELD + 10s"
                 buffed = self.shieldcooldownmax
             if buff == self.range:
                 self.range += 3
                 
-                p = "FIREBALL RANGE IMPROVED"
+                self.p1 = "FIREBALL RANGE IMPROVED"
                 buffed = self.range
             if buff == self.attackDelay:
                 self.attackDelay -= 0.0025
                 
-                p = "ATTACK SPEED IMPROVED"
+                self.p1 = "ATTACK SPEED IMPROVED"
                 buffed = self.attackDelay
             if buff == self.fireDelay:
                 self.fireDelay -= 0.0025
                 
-                p = "FIRE SPEED IMPROVED"
+                self.p1 = "FIRE SPEED IMPROVED"
                 buffed = self.fireDelay
-            print(p)
-            return p
+            self.p = "LVL " + str(self.LVL) + "  " + self.p1
+    
 
     def go_left(self):
         self.pos[0] -= self.speed
@@ -146,16 +148,11 @@ class Player(pygame.sprite.Sprite):
                 if s >= maxscore:
                     maxscore = s
             self.maxscore = maxscore
-            if self.totalXP > maxscore:#Si on a battu le meilleur score score 
-                print("\nBravo nouveau record de kill\n",self.killcount)
             scorefile.close()
 
             scorefile = open("main/Score.csv","a")#Ensuite, on écrit les statistiques de la partie
             scorefile.write(f"{self.totalXP};{self.killcount};{gameTime};{vague};{self.LVL};\n")
             scorefile.close()
-
-            print("game over")
-            print("nombre de kill : ", self.killcount)
             return True
         return False
 

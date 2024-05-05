@@ -17,13 +17,10 @@ class slime():
         self.xp = 5
         self.HP = 10
         self.maxHP = 10
-
         self.speed = 1
         self.normalSpeed = 1 
-
         self.attack = 10
         self.normalAttack = 10
-
         self.rect = self.image.get_rect()
 
 
@@ -62,8 +59,8 @@ class Orc():
 class Bat():
     def __init__(self):
         self.sprite_sheet = pygame.image.load('Sprites/Boss/batright2.png')
-        self.sprite_sheet2 = pygame.image.load('Sprites\Boss\DROITMurcielago1.png')
-        self.sprite_sheet3 = pygame.image.load('Sprites\Boss\DROITMurcielago3.png')
+        self.sprite_sheet2 = pygame.image.load('Sprites/Boss/DROITMurcielago1.png')
+        self.sprite_sheet3 = pygame.image.load('Sprites/Boss/DROITMurcielago3.png')
         self.imageliste = [get_image(self.sprite_sheet,0, 0,32,32),get_image(self.sprite_sheet3,0, 0,32,32),get_image(self.sprite_sheet2,0, 0,32,32)]
         self.it = 0
         self.image = self.imageliste[0]

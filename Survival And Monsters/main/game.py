@@ -39,6 +39,7 @@ class Play:
         self.writet=False
         self.writeele = ""
         
+        
         #volume:
         paramFichier = open("main/param.txt","r")#fichier qui contient les parametres
         for i in paramFichier :
@@ -49,6 +50,7 @@ class Play:
 
         self.bord = []#zone interdite
         self.zone = []#zone disponible
+        
 
         for obj in tmx_data.objects :
             if obj.name == "colisiones":
@@ -71,8 +73,8 @@ class Play:
         self.listFireball = []
 
 
-        self.tailleVague = 10 #taille de la premiere vague d'ennemis
-        self.coefVague = 1
+        self.tailleVague = 5 #taille de la premiere vague d'ennemis
+        self.coefVague = 4
         self.nVague = 0#numéro de la vague
         
 
@@ -81,7 +83,7 @@ class Play:
         self.épée = Animations_sprites(self.player.pos[0],self.player.pos[1])
 
         self.music = sound()
-        self.listEtape = [1,2,3,4,6,7]#liste des vagues où la musique évolue
+        self.listEtape = [1,2,3,4,5,6]#liste des vagues où la musique évolue
         self.nbMus = len(self.listEtape)
         self.etape = 0
 
@@ -122,9 +124,7 @@ class Play:
     
     def Experience(self,xpgive):#gère l'expérience
         self.player.XP += xpgive
-        self.writeele = self.player.XPmanage()
-        print(f"XP : {self.player.XP}")
-        print(f"niv:{self.player.LVL}")
+        self.player.XPmanage()
 
     def modifParam(self,param,val):#fonction  qui modifie un paramtre dans le fichier parametre
         paramFichier = open("main/param.txt","r")
@@ -162,20 +162,16 @@ class Play:
             
             if touche[pygame.K_UP]:
                 self.player.go_up()
-                #self.hpbar.go_up()
             
             if touche[pygame.K_LEFT]:
                 self.player.go_left()
-                #self.hpbar.go_left()
-            
+                        
             if touche[pygame.K_RIGHT]:
                 self.player.go_right()
-                #self.hpbar.go_right()
-            
+                
             if touche[pygame.K_DOWN]:
                 self.player.go_down()
-                #self.hpbar.go_down()
-            
+                
             if touche[pygame.K_SPACE] and self.delay(self.oldZone,self.player.zoneDelay):
                 self.player.isZone = True
                 self.zoneS.pos = self.player.pos
@@ -286,9 +282,11 @@ class Play:
                     self.listEnnemis.append(ennemi(randint(self.zone[a].x,self.zone[a].x+self.zone[a].width),randint(self.zone[a].y,self.zone[a].y+self.zone[a].height)))#création d'un nouvel ennemi à des positions random 
                     self.group.add(self.listEnnemis[-1])#affichage du dernier ennemi
 
-                if len(self.listEnnemis) == self.tailleVague:#Si on  a ajouter le bon nombre d'ennemis
+                if len(self.listEnnemis) == self.tailleVague and aRemplir == True:#Si on  a ajouter le bon nombre d'ennemis
                     aRemplir = False
-                    self.coefVague = randint(self.nVague,2*self.nVague)#plus on avance plus le coef de multiplication des vagues augmente
+                    self.coefVague = self.coefVague * 0.6#plus on avance plus le coef de multiplication de la taille des vagues diminue
+                    if self.coefVague<1:#pour que la taile des vagues ne diminue pas
+                        self.coefVague = 1.3
                 
                 for en in self.listEnnemis :#pour chaque ennemis
                     
@@ -298,8 +296,8 @@ class Play:
 
                     
 
-                    if self.player.LVL >1 and self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
-                        #self.music.fireBallSound.play()
+                    if self.player.LVL >3 and self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
+                        
                         pygame.mixer.Sound.play(self.music.fireBallSound)
                         pygame.mixer.Sound.set_volume(self.music.fireBallSound,float(self.volume)/10)
                         self.oldFire = time()#actualisation de la derniere fois que l'on à tir
@@ -311,15 +309,15 @@ class Play:
                     if self.listFireball != []:                      
                         for fir in self.listFireball:#pour chaque boulle de feu
                             if en.hit(fir.rect):#Si elle touche un ennemis
-                                #self.music.explosionSound.play()#Jouer le bruit de l'xplosion
-                                pygame.mixer.Sound.play(self.music.explosionSound)
+                               
+                                pygame.mixer.Sound.play(self.music.explosionSound)#Jouer le bruit de l'xplosion
                                 pygame.mixer.Sound.set_volume(self.music.explosionSound,float(self.volume)/10)
                                 delete = self.kill(en,fir.degat)#Si l'ennemis n'as plus de vie on le suprime
                                 self.group.remove(fir)#On désafiche la boule de feu 
                                 self.listFireball.remove(fir)#et on la supprime
         
                     if en.hit(self.player.rect) and self.delay(self.oldAt,self.player.attackDelay) and delete == False:#si le joueur touche l'ennemis, peut l'attaquer et qu'il n'a pas encore été supprimé
-                        #self.music.epeeSound.play()
+                        
                         pygame.mixer.Sound.play(self.music.epeeSound)
                         pygame.mixer.Sound.set_volume(self.music.epeeSound,float(self.volume)/10)
                         self.oldAt = time()
@@ -344,7 +342,7 @@ class Play:
                         if not self.player.shield:#Si le joueur n'a pas de bouclier 
                             dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                             if(dam[1] == True):#Si le joueur prend des dégats
-                                #self.music.listDegatSound[randint(0,3)].play()
+                              
                                 pygame.mixer.Sound.play(self.music.listDegatSound[randint(0,3)])
                                 pygame.mixer.Sound.set_volume(self.music.listDegatSound[randint(0,3)],float(self.volume)/10)
                                 self.player.HP = dam[0]#On met à jour les points de vie du joueur en fonction des dégats infligé par l'ennemi
@@ -403,10 +401,11 @@ class Play:
                 self.screen.blit(self.menu.pausebutton,self.menu.pauserect)
 
                 if self.player.LVLED: 
-                    if self.xpbar.it == 50:
+                    if self.xpbar.it == 100:
                         self.player.LVLED = False
                         self.xpbar.it = 0
                     else:
+                        self.write(self.player.p,500,0)
                         self.screen.blit(self.xpbar.LVLimage,self.xpbar.rect)
                         self.xpbar.it += 1
 

@@ -90,7 +90,7 @@ class zoneAf(pygame.sprite.Sprite):
     def __init__(self,ran):
 
         super().__init__()
-        self.zoneImage = pygame.image.load('Sprites\Move\DSDS.png')
+        self.zoneImage = pygame.image.load('Sprites/Move/DSDS.png')
         self.zoneImage = pygame.transform.scale(self.zoneImage,(ran,ran))
         self.image = self.get_image(0, 0,ran)
         self.ran = ran
