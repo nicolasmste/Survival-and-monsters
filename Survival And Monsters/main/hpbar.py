@@ -6,7 +6,7 @@ class HPbar(pygame.sprite.Sprite):
     def __init__(self,x,y,hpratio,speed):
         super().__init__()
         self.ratio = hpratio
-        self.pos = [x-15,y+5]
+        self.pos = [x,y+37]
         self.sprite_HP = pygame.image.load('Sprites/Bars/hpBarGIF.png')
         self.HPIMAGES = [self.get_image(self.sprite_HP, 0+j*64 , 0 , 64, 64) for j in range (0,13)]
         self.image = self.HPIMAGES[0]
@@ -18,7 +18,7 @@ class HPbar(pygame.sprite.Sprite):
         self.image.set_colorkey([0, 0, 0])
 
     def updatepos(self,x,y): #Update vitesse et position
-        self.pos = [x-15,y+5]
+        self.pos = [x,y+37]
         self.rect.topleft = self.pos
 
     def get_image(self, myimage, x, y, x1, y1):

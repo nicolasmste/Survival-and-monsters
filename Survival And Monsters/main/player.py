@@ -9,9 +9,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,x,y):
         super().__init__()
         self.sprite_sheet = pygame.image.load('Sprites/Character/Base.png')
-        self.image = self.get_image(self.sprite_sheet, 0, 0, 32, 32) #coordonées de début du get
+        self.image = self.get_image(self.sprite_sheet, 0, 0, 64, 64) #coordonées de début du get
         self.image.set_colorkey([0, 0, 0]) #on supprime le noir
         self.rect = self.image.get_rect()
+        self.retourne = False#permet de savoir si le personnage est tourneé à gauche
         
         self.pos = [x,y] #position du joueur
         self.old_pos = self.pos.copy()
@@ -20,21 +21,16 @@ class Player(pygame.sprite.Sprite):
         
         #Statistiques de vitesse, de points de vie
         self.speed = 7 #vitesse du joueur
-        self.HP = 200
+        self.HP = 10
         self.maxHP = 200
         
         #Protection(item)
         self.shield = False
         self.shieldcooldownmax =  100
         self.shieldcooldown = self.shieldcooldownmax
-
+        self.LVLED = False #Verif si on gagne un niveau pour afficher
         #barre de vie
         self.ratio = self.HP / self.maxHP#permet de faire fonctionner la barre de vie
-        # self.sprite_HP = pygame.image.load('Sprites/Bars/hpBarGIF.png')
-        # self.HPIMAGES = [self.get_image(self.sprite_HP, 0+j*64 , 0 , 64, 64) for j in range (0,13)]
-        
-        #self.HPIMAGE = self.HPIMAGES[0]
-        #self.rectHP = self.HPIMAGE.get_rect()
 
         #expérience
         self.XP = 0
@@ -72,37 +68,55 @@ class Player(pygame.sprite.Sprite):
             self.totalXP += self.maxXP
             self.maxXP = ceil(self.maxXP * self.coeffXP)
             self.LVL += 1 
+            p = "LVL " + str(self.LVL) + "  "#phrase à afficher à l'écran
             #Buff random
+            self.LVLED = True
             buff = self.newtype()
             print(f"NEW BUFF:{buff}")
             if buff == self.maxHP:
                 self.maxHP += 20 
-                print("HP")
+                
+                p = "LIFE IMPROVED"
                 buffed = self.maxHP
             if buff == self.speed:
                 self.speed += 1
-                print("SPEED")
+                
+                p = "SPEED IMPROVED"
                 buffed =self.speed  
             if buff == self.shieldcooldownmax:
                 self.shieldcooldownmax += 10
-                print("Shield")
+                
+                p = "SHIELD + 10s"
                 buffed = self.shieldcooldownmax
             if buff == self.range:
                 self.range += 3
-                print("range")
+                
+                p = "FIREBALL RANGE IMPROVED"
                 buffed = self.range
             if buff == self.attackDelay:
                 self.attackDelay -= 0.0025
-                print("attaqueDelay")
+                
+                p = "ATTACK SPEED IMPROVED"
                 buffed = self.attackDelay
             if buff == self.fireDelay:
-                print("firedelay")
                 self.fireDelay -= 0.0025
+                
+                p = "FIRE SPEED IMPROVED"
                 buffed = self.fireDelay
+            print(p)
+            return p
 
-    def go_left(self): self.pos[0] -= self.speed
-
-    def go_right(self): self.pos[0] += self.speed
+    def go_left(self):
+        self.pos[0] -= self.speed
+        if self.retourne == False:
+            self.image = pygame.transform.flip(self.image,True,False)
+            self.retourne = True
+    
+    def go_right(self): 
+        self.pos[0] += self.speed
+        if self.retourne == True:
+            self.image = pygame.transform.flip(self.image,True,False)
+            self.retourne = False
 
     def go_up(self): self.pos[1] -= self.speed
 
@@ -116,6 +130,8 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.image.load("Sprites/Character/invisible.png")
         else :
             self.image = pygame.image.load('Sprites/Character/Base.png')
+            if self.retourne == True:
+                self.image = pygame.transform.flip(self.image,True,False)
             visible = True
         return visible
     

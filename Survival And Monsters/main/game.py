@@ -34,13 +34,18 @@ class Play:
         self.map_layer.zoom = 2
 
     #constantes utiles pour l'écriture de texte
-        self.setfont = pygame.font.SysFont(None,50)
+        self.setfont = pygame.font.SysFont("CopperPlate Gothic",40)
         self.textcooldown = 100
         self.writet=False
         self.writeele = ""
         
         #volume:
-        self.volume = 5
+        paramFichier = open("main/param.txt","r")#fichier qui contient les parametres
+        for i in paramFichier :
+            l = i.split(":")#les parametres (pour l'instant il n'y en a qu'un) sont sous la forme param:val
+            if l[0] == "vol": 
+                self.volume = int(l[1])
+                
 
         self.bord = []#zone interdite
         self.zone = []#zone disponible
@@ -76,7 +81,7 @@ class Play:
         self.épée = Animations_sprites(self.player.pos[0],self.player.pos[1])
 
         self.music = sound()
-        self.listEtape = [1,3,4,5,6,7]#liste des vagues où la musique évolue
+        self.listEtape = [1,2,3,4,6,7]#liste des vagues où la musique évolue
         self.nbMus = len(self.listEtape)
         self.etape = 0
 
@@ -117,10 +122,29 @@ class Play:
     
     def Experience(self,xpgive):#gère l'expérience
         self.player.XP += xpgive
-        self.player.XPmanage()
+        self.writeele = self.player.XPmanage()
         print(f"XP : {self.player.XP}")
         print(f"niv:{self.player.LVL}")
 
+    def modifParam(self,param,val):#fonction  qui modifie un paramtre dans le fichier parametre
+        paramFichier = open("main/param.txt","r")
+        
+        lines = []#On sauve les lignes qui ne changent pas
+        for i in paramFichier:
+            if i.split(":")[0] == param:#on modifie celle qui nous interesse
+                lines.append(i.split(":")[0]+":"+str(val))
+            else :
+                lines.append(i)
+        paramFichier.close()
+
+        paramFichier = open("main/param.txt","w")
+        for l in lines:#on réécrit le fichier
+            paramFichier.write(l)
+        paramFichier.close()
+
+    def modifVol(self,old):
+        if old != self.volume:#si le volume à été modifié:
+            self.modifParam("vol",self.volume)  
 
     def kill(self,ennemi,degat):#enleve de la vie à l'ennemis, si il est mort, on le supprime et ont ajoute 1 au kill count
         ennemi.HP -= degat
@@ -185,7 +209,14 @@ class Play:
         self.screen.blit(self.menu.gameoverscreen,self.menu.gorect) 
         self.write("GAME OVER",(self.screen.get_width()/10)*4,(self.screen.get_height()/10))
         self.write(f"SCORE:{self.player.totalXP}",(self.screen.get_width()/10)*4,(self.screen.get_height()/5)*3)
-        self.write(f"SCORE MAX:{self.player.maxscore} ",(self.screen.get_width()/10)*4,(self.screen.get_height()/5)*3+30)
+        if self.player.maxscore == -1:#si c'est la premiere partie joué
+            pass
+        elif self.player.maxscore < self.player.totalXP :#si on bat le meilleur score
+            self.write(f"NOUVEAU RECORD !!!",(self.screen.get_width()/10)*4,(self.screen.get_height()/5)*3+30)
+            self.write(f"L'ancien record était de :{self.player.maxscore} ",(self.screen.get_width()/10)*4,(self.screen.get_height()/5)*3+60)
+        else :
+            self.write(f"RECORD:{self.player.maxscore} ",(self.screen.get_width()/10)*4,(self.screen.get_height()/5)*3+30)
+
         for i in self.group:
             if i != self.player: self.group.remove(i)
 
@@ -204,10 +235,11 @@ class Play:
         self.screen.blit(self.menu.volumeplus,self.menu.plusbutton)
         self.screen.blit(self.menu.volumeminus,self.menu.minusbutton)
         self.write(f"{self.volume}",(self.screen.get_width()/31)*16,(self.screen.get_height()/10)*2+300)
-        self.write("CREDIT: Ernest Niederman, Francisco", (self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+20)
-        self.write("Ernesto Suarez Roca, ",(self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+60)
-        self.write("Nicolas-Thomas Marie-Sainte,", (self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+100)
-        self.write("Lohan Morvan",(self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+140)
+        self.write("  CREDIT: Ernest Niederman,", (self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+20)
+        self.write("  Francisco Ernesto Suarez Roca, ",(self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+60)
+        self.write("  Nicolas-Thomas Marie-Sainte,", (self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+100)
+        self.write("  Lohan Morvan",(self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+140)
+        self.write("  Remerciment pour la musique : Kiri",(self.screen.get_width()/8)*2+10,(self.screen.get_height()/10)*2+180)
 
     def update(self):
         
@@ -216,7 +248,9 @@ class Play:
         self.xpbar.update()
         self.hpbar.ratio = self.player.ratio #update position du joueur
         self.xpbar.ratio = self.player.xpratio
-        self.music.update(self.volume)
+        for en in self.listEnnemis:
+            if en.rect.collidelist(self.bord) > -1 : 
+                en.rollback()
         if self.player.rect.collidelist(self.bord) > -1 : 
             self.player.rollback()
         self.hpbar.updatepos(self.player.pos[0],self.player.pos[1])
@@ -229,6 +263,7 @@ class Play:
         self.timeStart = time()#temps auquel la partie à débuté
         
         while running:
+            
             
             if self.menu.PLAY and not self.menu.PAUSE:#si on est dans la partie
                 
@@ -258,10 +293,15 @@ class Play:
                 for en in self.listEnnemis :#pour chaque ennemis
                     
                     delete = False#Booléen pour savoir si l'ennemis a été supprimé
+                    en.saveloc()
                     en.moveTo(self.player.pos[0],self.player.pos[1])#deplacement de l'ennemis
 
+                    
+
                     if self.player.LVL >1 and self.distance(self.player.pos , en.pos) <= self.player.range and self.delay(self.oldFire,self.player.fireDelay) and self.player.pos != en.pos:#si un ennemis est dans la range on tire si l'attaque est rechargé et si on le joueur et l'ennemis ne sont pas a la meme position
-                        self.music.fireBallSound.play()
+                        #self.music.fireBallSound.play()
+                        pygame.mixer.Sound.play(self.music.fireBallSound)
+                        pygame.mixer.Sound.set_volume(self.music.fireBallSound,float(self.volume)/10)
                         self.oldFire = time()#actualisation de la derniere fois que l'on à tir
                         self.listFireball.append(fireBall(self.player.pos[0],self.player.pos[1],en.pos))#on ajoute une boule de feu 
                         self.listFireball[-1].image = pygame.transform.rotate(self.listFireball[-1].image,direction(self.listFireball[-1].cible,self.listFireball[-1].startPos))#on l'oriente dans la bonne direction
@@ -271,15 +311,19 @@ class Play:
                     if self.listFireball != []:                      
                         for fir in self.listFireball:#pour chaque boulle de feu
                             if en.hit(fir.rect):#Si elle touche un ennemis
-                                self.music.explosionSound.play()#Jouer le bruit de l'xplosion
+                                #self.music.explosionSound.play()#Jouer le bruit de l'xplosion
+                                pygame.mixer.Sound.play(self.music.explosionSound)
+                                pygame.mixer.Sound.set_volume(self.music.explosionSound,float(self.volume)/10)
                                 delete = self.kill(en,fir.degat)#Si l'ennemis n'as plus de vie on le suprime
                                 self.group.remove(fir)#On désafiche la boule de feu 
                                 self.listFireball.remove(fir)#et on la supprime
         
                     if en.hit(self.player.rect) and self.delay(self.oldAt,self.player.attackDelay) and delete == False:#si le joueur touche l'ennemis, peut l'attaquer et qu'il n'a pas encore été supprimé
-                        self.music.epeeSound.play()
+                        #self.music.epeeSound.play()
+                        pygame.mixer.Sound.play(self.music.epeeSound)
+                        pygame.mixer.Sound.set_volume(self.music.epeeSound,float(self.volume)/10)
                         self.oldAt = time()
-                        self.kill(en,self.player.degat)
+                        delete = self.kill(en,self.player.degat)
                         if self.animation == False:#si l'annimation du coup d'épée n'est pas cours
                             self.animation = True
                             self.cote = self.orientation(direction(en.pos,self.player.pos))#savoir de quelle coté vient l'ennemis et d'orienter le coup dans la bonne direction
@@ -294,13 +338,15 @@ class Play:
 
                     if self.player.isZone == True and delete == False:#si le joueur fait une attaque de zone
                         if(self.distance(self.player.pos,en.pos)<= self.player.zoneRange):#si l'ennemi est dans le rayon de l'attaque                        
-                            self.kill(en,self.player.zoneDegat)
+                            delete = self.kill(en,self.player.zoneDegat)
 
                     if self.delay(self.hitTime,self.player.invincibl):#Si le joueur n'est pas en état d'invicibilité
                         if not self.player.shield:#Si le joueur n'a pas de bouclier 
-                            dam = en.damage(self.player.rect,self.player.HP)#gestion des dégats au joueur
+                            dam = en.damage(self.player.pos,self.player.HP)#gestion des dégats au joueur
                             if(dam[1] == True):#Si le joueur prend des dégats
-                                self.music.listDegatSound[randint(0,3)].play()
+                                #self.music.listDegatSound[randint(0,3)].play()
+                                pygame.mixer.Sound.play(self.music.listDegatSound[randint(0,3)])
+                                pygame.mixer.Sound.set_volume(self.music.listDegatSound[randint(0,3)],float(self.volume)/10)
                                 self.player.HP = dam[0]#On met à jour les points de vie du joueur en fonction des dégats infligé par l'ennemi
                                 self.hitTime = time()#On actualise le temps de du dernier coup reçu    
                 
@@ -355,14 +401,21 @@ class Play:
                 self.screen.blit(self.xpbar.image,self.xpbar.rect)
                 if self.writet : self.writeingame()
                 self.screen.blit(self.menu.pausebutton,self.menu.pauserect)
-                
+
+                if self.player.LVLED: 
+                    if self.xpbar.it == 50:
+                        self.player.LVLED = False
+                        self.xpbar.it = 0
+                    else:
+                        self.screen.blit(self.xpbar.LVLimage,self.xpbar.rect)
+                        self.xpbar.it += 1
+
                 if self.player.end(self.timeStart,time(),self.nVague):#Si le joueur n'a plus de points de vie
                     pygame.mixer.music.stop()#On arrete la musique
                     self.menu.gameover = True
                     self.menu.PLAY = False
 
             if self.menu.PAUSE :
-                pygame.mixer.music.pause()
                 self.Pausemenu()
             
             if not self.menu.PLAY and not self.menu.gameover:
@@ -379,31 +432,39 @@ class Play:
             
             pygame.display.update()
             clock.tick(30) #limiter les FPS
+
+            self.music.update(self.volume)
   
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.press.collidepoint(event.pos) and not self.menu.PLAY and not self.menu.SETTINGS and not self.menu.gameover:
                     self.menu.PLAY = True #SI ON APPUIE SUR PLAY LE JEU SE LANCE 
                     pygame.mixer.music.stop()  
                 
-                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.pauserect.collidepoint(event.pos) and self.menu.PLAY and not self.menu.gameover :
-                    pygame.mouse.set_visible(True)
+                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.pauserect.collidepoint(event.pos) and self.menu.PLAY and not self.menu.gameover :#Bouton pour mettre en pause le jeu
                     self.menu.PAUSE = True #SI ON APPUIE SUR PAUSE LE JEU SE LANCE
+                    oldVol = self.volume
+                    pygame.mixer.music.pause()
                 
-                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.resumerect.collidepoint(event.pos) and self.menu.PAUSE:
+                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.resumerect.collidepoint(event.pos) and self.menu.PAUSE:#Bouton pour revenir au jeu
                     self.menu.PAUSE = False#tu clique trop vite il te faut juste un menue
+                    self.modifVol(oldVol)#on regarde si le volume à été modifié
                     pygame.mixer.music.unpause()
                 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.gorect.collidepoint(event.pos) and self.menu.gameover:
                     self.menu.gameover = False 
                 
-                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.setrect.collidepoint(event.pos) and not self.menu.PLAY and not self.menu.SETTINGS:
+                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.setrect.collidepoint(event.pos) and not self.menu.PLAY and not self.menu.SETTINGS:#Bouton pour accéder aux parametres
                     self.menu.SETTINGS = True
+                    oldVol = self.volume
                 
-                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.quitbutton.collidepoint(event.pos) and self.menu.SETTINGS:
+                if event.type == pygame.MOUSEBUTTONDOWN and self.menu.quitbutton.collidepoint(event.pos) and self.menu.SETTINGS:#Bouton pour quitter les parametres
                     self.menu.SETTINGS = False
+                    self.modifVol(oldVol)#on regarde si le volume à été modifié
                 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.minusbutton.collidepoint(event.pos) and (self.menu.SETTINGS or self.menu.PAUSE):
-                    if self.volume > 0 : self.volume -= 1    
+                    if self.volume > 0 :
+                        self.volume -= 1
+
                 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.menu.plusbutton.collidepoint(event.pos) and (self.menu.SETTINGS or self.menu.PAUSE):
                     if self.volume < 10 : self.volume += 1

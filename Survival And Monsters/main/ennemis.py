@@ -36,7 +36,9 @@ class ennemi(pygame.sprite.Sprite):
         self.normalAttack = self.type.normalAttack
 
         self.pos = [x,y]
+        self.old_pos = self.pos.copy()
         self.rect = self.image.get_rect()
+        self.feet = pygame.Rect(0,0,self.rect.width*0.5,16)
 
     def move(self): #Change Sprite
         if self.type.delay == 0:
@@ -49,6 +51,8 @@ class ennemi(pygame.sprite.Sprite):
                 self.image.set_colorkey([0, 0, 0])
             self.type.delay = 10
         else: self.type.delay -= 1
+
+    def saveloc(self): self.old_pos = self.pos.copy()
 
     def moveTo(self,Px,Py):#fonction qui déplace les ennemis vers le joueur
         
@@ -75,11 +79,11 @@ class ennemi(pygame.sprite.Sprite):
             else :
                 self.pos[1] += self.tan
 
-    def damage(self,Prect,PHP):#Si le joueur est touché
+    def damage(self,pPos,PHP):#Si le joueur est touché
         
-        if pygame.Rect.colliderect(self.rect,Prect):
+        r = 10
+        if (self.pos[0] < pPos[0]+r and self.pos[0] >= pPos[0]) and (self.pos[1] < pPos[1]+r and self.pos[1] >= pPos[1]):
             PHP -= self.attack
-            
             return PHP,True
         return PHP,False
 
@@ -98,3 +102,7 @@ class ennemi(pygame.sprite.Sprite):
         image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 32)) #Origine du crop et coordonnées de fin du crop
         return image
 
+    def rollback(self):#rollback pour bordures
+        self.pos = self.old_pos.copy()
+        self.rect.topleft = self.old_pos  #position
+        self.feet.midbottom = self.rect.midbottom
